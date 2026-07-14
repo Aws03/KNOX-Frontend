@@ -33,12 +33,10 @@ export default function FolderPage({ mode = "public" }: FolderPageProps) {
 
   const handleAddFolder = () => {
     // TODO: Implement add folder dialog
-    console.log("Add folder clicked");
   };
 
   const handleAddMaterial = () => {
     // TODO: Implement add material dialog
-    console.log("Add material clicked");
   };
 
   if (loading) return <LoadingState />;

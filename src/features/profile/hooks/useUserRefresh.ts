@@ -11,10 +11,8 @@ export const useUserRefresh = (currentUser: User | null) => {
     try {
       setIsRefreshing(true);
       setError(null);
-      console.log("[UserProfile] Fetching user info from /api/Users/me...");
 
       const userInfo = await getUserInfo();
-      console.log("[UserProfile] Fetched user info:", userInfo);
 
       if (!currentUser) return;
 
@@ -67,9 +65,6 @@ export const useUserRefresh = (currentUser: User | null) => {
       !user.fullName;
 
     if (isMissingData && !isRefreshing) {
-      console.log(
-        "[UserProfile] Missing user data, refetching from /api/Users/me"
-      );
       await refetchUserInfo();
     }
   };

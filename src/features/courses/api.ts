@@ -18,9 +18,13 @@ import type {
   CourseInfo,
 } from "./types";
 
-// Helper function to map API response to Course UI type
+// Helper function to map API response to Course UI type.
+// majorName comes from the caller's own selection/context (the by-major
+// endpoint doesn't repeat the major's name on every course row since the
+// caller already knows which major it asked for).
 export const mapApiResponseToCourse = (
-  apiCourse: CourseApiResponse
+  apiCourse: CourseApiResponse,
+  majorName: string = ""
 ): Course => {
   // Map requirement nature and type to badges
   const badges: string[] = [];
@@ -35,7 +39,7 @@ export const mapApiResponseToCourse = (
     id: apiCourse.id,
     code: apiCourse.courseCode,
     name: apiCourse.courseName,
-    major: "Computer Science", // Can be enhanced with actual major data
+    major: majorName,
     badges,
     materials: apiCourse.numberOfMaterials,
     quizzes: apiCourse.numberOfQuizzes,
@@ -88,7 +92,9 @@ export const fetchCoursesByMajor = async (
   );
 
   // Map API response to Course type
-  const mappedCourses: Course[] = response.items.map(mapApiResponseToCourse);
+  const mappedCourses: Course[] = response.items.map((item) =>
+    mapApiResponseToCourse(item, filters?.majorName)
+  );
 
   return {
     ...response,

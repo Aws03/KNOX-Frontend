@@ -128,6 +128,7 @@ const CourseFilter = ({
                   universityId: user.universityId,
                   collegeId: user.facultyId,
                   majorId: user.majorId,
+                  majorName: user.majorName,
                 });
               }, 100);
             }
@@ -156,6 +157,7 @@ const CourseFilter = ({
         universityId: user.universityId,
         collegeId: user.facultyId,
         majorId: user.majorId,
+        majorName: user.majorName,
       });
     } else {
       filterState.clearFilters(false);

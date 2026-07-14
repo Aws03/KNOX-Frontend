@@ -8,18 +8,21 @@ import { RouterProviderApp } from "./providers/RouterProviderApp.tsx";
 import { ThemeProvider } from "./providers/ThemeProvider.tsx";
 // Switched to Axios-based AuthProvider implementation
 import { AuthProvider } from "@/app/providers/AuthProvider.tsx";
+import { ErrorBoundary } from "@/shared/components/ErrorBoundary.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <AuthProvider>
-        <I18nProvider>
-          <QueryProvider>
-            <RouterProviderApp />
-            <Toaster richColors position="top-right" />
-          </QueryProvider>
-        </I18nProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <AuthProvider>
+          <I18nProvider>
+            <QueryProvider>
+              <RouterProviderApp />
+              <Toaster richColors position="top-right" />
+            </QueryProvider>
+          </I18nProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

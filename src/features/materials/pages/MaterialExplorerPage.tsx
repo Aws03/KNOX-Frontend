@@ -28,32 +28,26 @@ export default function MaterialExplorerPage({
   // Management action handlers
   const handleAddFolder = () => {
     // TODO: Open add folder dialog
-    console.log("Add folder clicked");
   };
 
   const handleAddMaterial = () => {
     // TODO: Open add material dialog
-    console.log("Add material clicked");
   };
 
-  const handleEditFolder = (folder: FolderItem) => {
+  const handleEditFolder = (_folder: FolderItem) => {
     // TODO: Open edit folder dialog
-    console.log("Edit folder:", folder.id);
   };
 
-  const handleDeleteFolder = (folderId: number) => {
+  const handleDeleteFolder = (_folderId: number) => {
     // TODO: Confirm and delete folder
-    console.log("Delete folder:", folderId);
   };
 
-  const handleEditMaterial = (material: MaterialItem) => {
+  const handleEditMaterial = (_material: MaterialItem) => {
     // TODO: Open edit material dialog
-    console.log("Edit material:", material.id);
   };
 
-  const handleDeleteMaterial = (materialId: number) => {
+  const handleDeleteMaterial = (_materialId: number) => {
     // TODO: Confirm and delete material
-    console.log("Delete material:", materialId);
   };
 
   if (loading) {

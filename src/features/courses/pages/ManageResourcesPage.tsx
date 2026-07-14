@@ -143,7 +143,6 @@ const ManageResourcesPage = () => {
           });
         } catch {
           // Course info doesn't exist yet (404 or other error)
-          console.log("Course info not found - user needs to create it");
           setHasCourseInfo(false);
           setCourseInfo(null);
           setResources([]);

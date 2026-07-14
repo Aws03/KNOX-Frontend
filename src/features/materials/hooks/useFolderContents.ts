@@ -91,14 +91,12 @@ export function useFolderContents({
     }
   };
 
-  const handleEditFolder = (folder: FolderItem) => {
+  const handleEditFolder = (_folder: FolderItem) => {
     // TODO: Implement edit folder dialog
-    console.log("Edit folder:", folder);
   };
 
-  const handleEditMaterial = (material: MaterialItem) => {
+  const handleEditMaterial = (_material: MaterialItem) => {
     // TODO: Implement edit material dialog
-    console.log("Edit material:", material);
   };
 
   return {

@@ -90,6 +90,7 @@ export const useFilterState = () => {
       universityId: selectedUniversity?.id,
       collegeId: selectedCollege?.id,
       majorId: selectedMajor?.id,
+      majorName: selectedMajor?.name,
       courseType: selectedCourseType || undefined,
       requirement: selectedRequirement || undefined,
     }),

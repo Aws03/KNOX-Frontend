@@ -2,6 +2,7 @@ import { apiClient } from "@/lib/api/apiClient";
 import { getPaginated } from "@/lib/api/pagination";
 import type { PaginatedResponse } from "@/lib/api/types";
 import type { QuizDetails, CreateQuizPayload, QuizListItem } from "./types";
+import { getStoredToken } from "@/hooks/authStorage";
 
 /**
  * Upload a temporary file (image) to the server
@@ -94,11 +95,10 @@ export const fetchQuizzesByCourse = async (
  * Like a quiz (TODO: Implement when backend API is ready)
  * @param quizId - The ID of the quiz to like
  */
-export const likeQuiz = async (quizId: string): Promise<void> => {
+export const likeQuiz = async (_quizId: string): Promise<void> => {
   try {
     // TODO: Implement when backend API is ready
     // await apiClient.post(`/quizzes/${quizId}/like`);
-    console.log("Like quiz:", quizId);
   } catch (err) {
     console.error("Failed to like quiz:", err);
     throw new Error("Failed to like quiz");
@@ -109,11 +109,10 @@ export const likeQuiz = async (quizId: string): Promise<void> => {
  * Dislike a quiz (TODO: Implement when backend API is ready)
  * @param quizId - The ID of the quiz to dislike
  */
-export const dislikeQuiz = async (quizId: string): Promise<void> => {
+export const dislikeQuiz = async (_quizId: string): Promise<void> => {
   try {
     // TODO: Implement when backend API is ready
     // await apiClient.post(`/quizzes/${quizId}/dislike`);
-    console.log("Dislike quiz:", quizId);
   } catch (err) {
     console.error("Failed to dislike quiz:", err);
     throw new Error("Failed to dislike quiz");
@@ -146,7 +145,7 @@ export const submitQuizScore = async (
  */
 export const getUserIdFromToken = (): number => {
   try {
-    const authData = localStorage.getItem("authToken");
+    const authData = getStoredToken();
     if (!authData) return 1;
 
     const tokenPayload = JSON.parse(atob(authData.split(".")[1]));
@@ -166,5 +165,5 @@ export const getUserIdFromToken = (): number => {
  * @returns true if user is logged in
  */
 export const isUserLoggedIn = (): boolean => {
-  return localStorage.getItem("authToken") !== null;
+  return getStoredToken() !== null;
 };

@@ -53,14 +53,12 @@ const QuizzesPage = ({ mode = "public" }: QuizzesPageProps) => {
     navigate(`/courses/${courseId}/quizzes/add`);
   };
 
-  const handleEditQuiz = (quizId: number) => {
+  const handleEditQuiz = (_quizId: number) => {
     // TODO: Implement edit functionality
-    console.log("Edit quiz:", quizId);
   };
 
-  const handleDeleteQuiz = (quizId: number) => {
+  const handleDeleteQuiz = (_quizId: number) => {
     // TODO: Implement delete functionality
-    console.log("Delete quiz:", quizId);
   };
 
   return (

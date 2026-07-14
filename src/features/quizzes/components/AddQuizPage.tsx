@@ -428,7 +428,7 @@
 
 //     try {
 //       // Get user ID from auth storage
-//       const authData = localStorage.getItem("authToken");
+//       const authData = localStorage.getItem("accessToken");
 //       let writerId = 1; // Default value
 
 //       if (authData) {

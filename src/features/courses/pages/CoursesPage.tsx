@@ -58,8 +58,8 @@ const CoursesPage = () => {
     fetchCourses(appliedFilters, currentPage, pageSize);
   }, [appliedFilters, currentPage, pageSize, fetchCourses]);
 
-  const handleCourseClick = (courseId: number) => {
-    console.log(`Navigate to course ${courseId}`);
+  const handleCourseClick = (_courseId: number) => {
+    // TODO: Navigate to course detail page
   };
 
   const handleApplyFilters = (filters: CourseFilterValues) => {

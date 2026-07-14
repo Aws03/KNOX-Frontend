@@ -71,6 +71,7 @@ export interface CourseFilterValues {
   universityId?: number;
   collegeId?: number;
   majorId?: number;
+  majorName?: string;
   courseType?: string;
   requirement?: string;
 }

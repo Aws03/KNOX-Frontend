@@ -50,8 +50,6 @@ const LanguageToggle = () => {
     window.dispatchEvent(
       new CustomEvent("languageChange", { detail: { language } })
     );
-
-    console.log(`Language changed to: ${language}`);
   }, [language]);
 
   const currentLanguage = languages.find((lang) => lang.code === language);

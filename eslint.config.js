@@ -19,5 +19,14 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Allow intentionally-unused parameters (e.g. unimplemented handler
+      // stubs that must match a prop's function signature) when prefixed
+      // with an underscore - matches tsconfig's noUnusedParameters convention.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
   },
 ])

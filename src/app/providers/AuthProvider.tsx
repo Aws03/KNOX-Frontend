@@ -76,7 +76,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Once a session has been torn down, nothing may schedule or attempt
       // another refresh - this is what stops the loop from restarting itself.
       if (isSessionTerminated.current) {
-        console.log("[Auth] Session terminated, not scheduling refresh");
         return;
       }
 
@@ -89,20 +88,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const refreshBuffer = Math.min(5 * 60 * 1000, timeUntilExpiry / 2);
       const timeUntilRefresh = timeUntilExpiry - refreshBuffer;
 
-      console.log("[Auth] Scheduling token refresh:", {
-        expiresAt: new Date(expiresAt).toISOString(),
-        timeUntilExpiry: Math.round(timeUntilExpiry / 1000) + "s",
-        timeUntilRefresh: Math.round(timeUntilRefresh / 1000) + "s",
-      });
-
       if (timeUntilRefresh <= 0) {
         // Token is already expired or about to expire, refresh immediately
         if (isRefreshing.current) {
-          console.log("[Auth] Refresh already in progress, skipping");
           return;
         }
 
-        console.log("[Auth] Token needs immediate refresh");
         isRefreshing.current = true;
         try {
           const response = await apiRefreshToken({
@@ -131,14 +122,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (typeof window !== "undefined") {
         refreshTimeoutRef.current = window.setTimeout(async () => {
           if (isSessionTerminated.current || isRefreshing.current) {
-            console.log(
-              "[Auth] Refresh already in progress or session terminated, skipping"
-            );
             return;
           }
 
           isRefreshing.current = true;
-          console.log("[Auth] Refreshing token...");
 
           try {
             const response = await apiRefreshToken({
@@ -150,7 +137,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 response.accessToken,
                 response.refreshToken
               );
-              console.log("[Auth] Token refreshed successfully");
             }
           } catch (error) {
             console.error("[Auth] Failed to refresh token:", error);
@@ -213,7 +199,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // Fetch detailed user info from /api/Users/me
         try {
           const userInfo = await getUserInfo();
-          console.log("[Auth] Fetched detailed user info:", userInfo);
 
           // Merge detailed user info with JWT data
           userData = {

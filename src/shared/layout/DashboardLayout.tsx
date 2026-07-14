@@ -5,7 +5,6 @@ import {
   FolderTree,
   Users,
   PenTool,
-  FileText,
   HomeIcon,
 } from "lucide-react";
 import { useAuth } from "@/app/providers/useAuth";
@@ -123,8 +122,6 @@ const DashboardLayout = () => {
     if (location.pathname.startsWith("/dashboard/users")) return "users";
     if (location.pathname.startsWith("/dashboard/writer-statistics"))
       return "writer-statistics";
-    if (location.pathname.startsWith("/dashboard/writer-application"))
-      return "writer-applications";
     return "analytics";
   };
 
@@ -138,8 +135,6 @@ const DashboardLayout = () => {
       breadcrumbs.push({ label: "Manage Users" });
     } else if (path.startsWith("/dashboard/writer-statistics")) {
       breadcrumbs.push({ label: "Writer Statistics" });
-    } else if (path.startsWith("/dashboard/writer-applications")) {
-      breadcrumbs.push({ label: "Writers Application" });
     } else if (path.startsWith("/dashboard/courses")) {
       // Handle courses materials and folders
       const parts = path.split("/").filter(Boolean);
@@ -282,21 +277,6 @@ const DashboardLayout = () => {
                       >
                         <PenTool />
                         <span>Writer Statistics</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )}
-
-                  {/* Writers Application - Admin and SuperAdmin only */}
-                  {hasRole(["Admin", "SuperAdmin"]) && (
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        isActive={getActivePage() === "writer-applications"}
-                        onClick={() =>
-                          navigate("/dashboard/writer-applications")
-                        }
-                      >
-                        <FileText />
-                        <span>Writers Application</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )}
