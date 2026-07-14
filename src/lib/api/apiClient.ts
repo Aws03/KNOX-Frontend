@@ -30,17 +30,29 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Guards against multiple in-flight requests each independently clearing the
+// session and redirecting when the token expires (they'd all 401 at once).
+// Never reset: window.location.href below fully reloads the page, which
+// resets this module's state anyway, so one trip per page life is correct.
+let isHandlingUnauthorized = false;
+
 // Response interceptor: Handle 401 errors
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Don't clear session on login/refresh failures
+    // Don't clear session on login/refresh failures - the auth flow itself
+    // (AuthProvider) is responsible for deciding what a failed refresh means.
     const isAuthEndpoint = error.config?.url?.includes("/auth/");
 
-    if (error.response?.status === 401 && !isAuthEndpoint) {
+    if (
+      error.response?.status === 401 &&
+      !isAuthEndpoint &&
+      !isHandlingUnauthorized
+    ) {
+      isHandlingUnauthorized = true;
       console.error("[API] Unauthorized - clearing session");
       clearSession();
-      window.location.href = "/login";
+      window.location.href = "/auth/login";
     }
 
     return Promise.reject(error);

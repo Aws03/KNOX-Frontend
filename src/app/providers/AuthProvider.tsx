@@ -40,6 +40,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isInitialized = useRef(false);
   const refreshTimeoutRef = useRef<number | null>(null);
   const isRefreshing = useRef(false);
+  // Latches once a session is torn down (e.g. after a failed refresh) so
+  // nothing already in flight or scheduled can restart the refresh cycle.
+  // Cleared again on a fresh, successful login.
+  const isSessionTerminated = useRef(false);
 
   const clearRefreshTimer = useCallback(() => {
     if (refreshTimeoutRef.current && typeof window !== "undefined") {
@@ -49,6 +53,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const handleSessionExpired = useCallback(() => {
+    // Idempotent: multiple callers (a failed refresh, a 401 elsewhere) can
+    // race here - only the first one should actually tear anything down.
+    if (isSessionTerminated.current) return;
+    isSessionTerminated.current = true;
+
     clearRefreshTimer();
     setUser(null);
     clearSession();
@@ -64,6 +73,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Refresh the access token before it expires
   const scheduleTokenRefresh = useCallback(
     async (expiresAt: number, currentRefreshToken: string) => {
+      // Once a session has been torn down, nothing may schedule or attempt
+      // another refresh - this is what stops the loop from restarting itself.
+      if (isSessionTerminated.current) {
+        console.log("[Auth] Session terminated, not scheduling refresh");
+        return;
+      }
+
       clearRefreshTimer();
 
       const now = Date.now();
@@ -81,20 +97,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (timeUntilRefresh <= 0) {
         // Token is already expired or about to expire, refresh immediately
-        console.log("[Auth] Token needs immediate refresh");
-        try {
-          if (!isRefreshing.current) {
-            isRefreshing.current = true;
-            const response = await apiRefreshToken({
-              refreshToken: currentRefreshToken,
-            });
+        if (isRefreshing.current) {
+          console.log("[Auth] Refresh already in progress, skipping");
+          return;
+        }
 
-            if (response.accessToken) {
-              await decodeAndSetUser(
-                response.accessToken,
-                response.refreshToken
-              );
-            }
+        console.log("[Auth] Token needs immediate refresh");
+        isRefreshing.current = true;
+        try {
+          const response = await apiRefreshToken({
+            refreshToken: currentRefreshToken,
+          });
+
+          if (response.accessToken) {
+            await decodeAndSetUser(
+              response.accessToken,
+              response.refreshToken
+            );
           }
         } catch (error) {
           console.error("[Auth] Failed to refresh token:", error);
@@ -111,15 +130,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (typeof window !== "undefined") {
         refreshTimeoutRef.current = window.setTimeout(async () => {
+          if (isSessionTerminated.current || isRefreshing.current) {
+            console.log(
+              "[Auth] Refresh already in progress or session terminated, skipping"
+            );
+            return;
+          }
+
+          isRefreshing.current = true;
+          console.log("[Auth] Refreshing token...");
+
           try {
-            if (isRefreshing.current) {
-              console.log("[Auth] Refresh already in progress, skipping");
-              return;
-            }
-
-            isRefreshing.current = true;
-            console.log("[Auth] Refreshing token...");
-
             const response = await apiRefreshToken({
               refreshToken: currentRefreshToken,
             });
@@ -252,6 +273,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     async (email: string, password: string) => {
       try {
         setIsLoading(true);
+        // A fresh login starts a new session lifecycle - if the previous one
+        // was terminated (e.g. failed refresh) without a full page reload
+        // (already on the login page), the refresh cycle must be able to run again.
+        isSessionTerminated.current = false;
         const response = await apiLogin({ email, password });
 
         if (response.accessToken && response.refreshToken) {
