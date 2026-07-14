@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   ActivityIcon,
   ArrowDownIcon,
@@ -26,10 +27,6 @@ import GrowthMetricsChart from "@/features/dashboard/componenets/GrowthMetricsCh
 // Analytics data structure
 import type { AnalyticsData } from "../types";
 import { fetchAnalyticsData } from "../api";
-
-// Mock analytics data (replace with API call)
-
-const analyticsData: AnalyticsData = await fetchAnalyticsData();
 
 // Calculate growth percentages
 const calculateGrowth = (data: { month: string; count: number }[]): number => {
@@ -226,19 +223,50 @@ const QuickInsightCard = ({
 );
 
 const AnalyticsPage = () => {
+  // Fetched on mount (i.e. once this route actually renders, which
+  // ProtectedRoute already gates to SuperAdmin), not at module load time.
+  const {
+    data: analyticsData,
+    isLoading,
+    isError,
+  } = useQuery<AnalyticsData>({
+    queryKey: ["dashboard-statistics"],
+    queryFn: fetchAnalyticsData,
+  });
+
   // Calculate growth rates
   const usersGrowth = useMemo(
-    () => calculateGrowth(analyticsData.usersGrowth),
-    []
+    () => (analyticsData ? calculateGrowth(analyticsData.usersGrowth) : 0),
+    [analyticsData]
   );
   const quizzesGrowth = useMemo(
-    () => calculateGrowth(analyticsData.quizzesGrowth),
-    []
+    () => (analyticsData ? calculateGrowth(analyticsData.quizzesGrowth) : 0),
+    [analyticsData]
   );
   const materialsGrowth = useMemo(
-    () => calculateGrowth(analyticsData.materialsGrowth),
-    []
+    () => (analyticsData ? calculateGrowth(analyticsData.materialsGrowth) : 0),
+    [analyticsData]
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-lg text-muted-foreground">
+          Loading analytics...
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !analyticsData) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-lg text-destructive">
+          Failed to load analytics data.
+        </div>
+      </div>
+    );
+  }
 
   // Hero metrics data
   const heroMetrics: HeroMetricProps[] = [
