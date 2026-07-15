@@ -1,11 +1,15 @@
 import { apiClient } from "@/lib/api/apiClient";
 import type {
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
   LoginRequest,
   LoginResponse,
   RefreshRequest,
   RefreshResponse,
   RegisterRequest,
   RegisterResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
   UserInfoResponse,
 } from "@/features/auth/types";
 import { clearSession } from "@/hooks/authStorage";
@@ -48,5 +52,28 @@ export async function register(
 
 export async function getUserInfo(): Promise<UserInfoResponse> {
   const response = await apiClient.get<UserInfoResponse>("/Users/me");
+  return response.data;
+}
+
+// There's no dedicated /auth/forgot-password endpoint - send-verification-otp
+// is the same generic "email an OTP to this address" mechanism the account
+// verification flow uses, and it's what the reset-password flow relies on too.
+export async function forgotPassword(
+  data: ForgotPasswordRequest
+): Promise<ForgotPasswordResponse> {
+  const response = await apiClient.post<ForgotPasswordResponse>(
+    "/auth/send-verification-otp",
+    data
+  );
+  return response.data;
+}
+
+export async function resetPassword(
+  data: ResetPasswordRequest
+): Promise<ResetPasswordResponse> {
+  const response = await apiClient.post<ResetPasswordResponse>(
+    "/auth/reset-password",
+    data
+  );
   return response.data;
 }
