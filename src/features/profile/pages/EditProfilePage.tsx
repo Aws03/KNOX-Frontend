@@ -11,6 +11,7 @@ import { getInitials } from "../utils/profileUtils";
 import { ImageCropper } from "../components/ImageCropper";
 import { ProfilePictureMenu } from "../components/ProfilePictureMenu";
 import { ImageViewerDialog } from "../components/ImageViewerDialog";
+import ChangePasswordCard from "../components/ChangePasswordCard";
 import {
   updateProfile,
   uploadProfilePicture,
@@ -243,6 +244,9 @@ const EditProfilePage = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Change Password Card */}
+          <ChangePasswordCard />
 
           {/* Academic Info Card */}
           <Card className="relative overflow-hidden border-slate-200/50 dark:border-slate-800/50 shadow-lg">

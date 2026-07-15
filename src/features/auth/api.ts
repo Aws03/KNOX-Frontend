@@ -1,5 +1,7 @@
 import { apiClient } from "@/lib/api/apiClient";
 import type {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   ForgotPasswordRequest,
   ForgotPasswordResponse,
   LoginRequest,
@@ -73,6 +75,18 @@ export async function resetPassword(
 ): Promise<ResetPasswordResponse> {
   const response = await apiClient.post<ResetPasswordResponse>(
     "/auth/reset-password",
+    data
+  );
+  return response.data;
+}
+
+// Requires an authenticated session - apiClient's request interceptor attaches
+// the access token automatically, same as every other authenticated call.
+export async function changePassword(
+  data: ChangePasswordRequest
+): Promise<ChangePasswordResponse> {
+  const response = await apiClient.post<ChangePasswordResponse>(
+    "/auth/change-password",
     data
   );
   return response.data;
