@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/shared/ui/button";
 import { likeQuiz, dislikeQuiz, isUserLoggedIn } from "../api";
 import { QuizResultsCard } from "../components/QuizResultsCard";
@@ -25,14 +26,8 @@ const QuizQuestionsPage = () => {
   >(null);
 
   // Custom hooks for state management
-  const {
-    quiz,
-    loading,
-    error,
-    isLoggedIn,
-    updateQuizLikes,
-    updateQuizDislikes,
-  } = useQuizState(quizId, isUserLoggedIn);
+  const { quiz, loading, error, isLoggedIn, updateQuizReactionCounts } =
+    useQuizState(quizId, isUserLoggedIn);
 
   const {
     userAnswers,
@@ -92,10 +87,13 @@ const QuizQuestionsPage = () => {
     if (!isLoggedIn || !quizId || !quiz) return;
 
     try {
-      await likeQuiz(quizId);
-      updateQuizLikes(quiz.likes + 1);
+      const { likes, dislikes } = await likeQuiz(quizId);
+      updateQuizReactionCounts(likes, dislikes);
     } catch (err) {
       console.error("Failed to like quiz:", err);
+      toast.error("Couldn't like this quiz", {
+        description: err instanceof Error ? err.message : undefined,
+      });
     }
   };
 
@@ -103,10 +101,13 @@ const QuizQuestionsPage = () => {
     if (!isLoggedIn || !quizId || !quiz) return;
 
     try {
-      await dislikeQuiz(quizId);
-      updateQuizDislikes(quiz.dislikes + 1);
+      const { likes, dislikes } = await dislikeQuiz(quizId);
+      updateQuizReactionCounts(likes, dislikes);
     } catch (err) {
       console.error("Failed to dislike quiz:", err);
+      toast.error("Couldn't dislike this quiz", {
+        description: err instanceof Error ? err.message : undefined,
+      });
     }
   };
 

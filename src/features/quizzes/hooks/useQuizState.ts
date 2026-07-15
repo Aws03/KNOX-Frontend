@@ -8,8 +8,7 @@ interface UseQuizStateReturn {
   error: string | null;
   isLoggedIn: boolean;
   loadQuizDetails: () => Promise<void>;
-  updateQuizLikes: (likes: number) => void;
-  updateQuizDislikes: (dislikes: number) => void;
+  updateQuizReactionCounts: (likes: number, dislikes: number) => void;
 }
 
 export const useQuizState = (
@@ -37,15 +36,13 @@ export const useQuizState = (
     }
   };
 
-  const updateQuizLikes = (likes: number) => {
+  // Sets both counts from a single response so a Like<->Dislike switch (which
+  // changes both counters server-side) can't lose one of the two updates -
+  // calling updateQuizLikes then updateQuizDislikes separately would have
+  // each closure over the same pre-update `quiz`, silently dropping the first.
+  const updateQuizReactionCounts = (likes: number, dislikes: number) => {
     if (quiz) {
-      setQuiz({ ...quiz, likes });
-    }
-  };
-
-  const updateQuizDislikes = (dislikes: number) => {
-    if (quiz) {
-      setQuiz({ ...quiz, dislikes });
+      setQuiz({ ...quiz, likes, dislikes });
     }
   };
 
@@ -60,7 +57,6 @@ export const useQuizState = (
     error,
     isLoggedIn,
     loadQuizDetails,
-    updateQuizLikes,
-    updateQuizDislikes,
+    updateQuizReactionCounts,
   };
 };

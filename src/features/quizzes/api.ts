@@ -1,7 +1,12 @@
 import { apiClient } from "@/lib/api/apiClient";
 import { getPaginated } from "@/lib/api/pagination";
 import type { PaginatedResponse } from "@/lib/api/types";
-import type { QuizDetails, CreateQuizPayload, QuizListItem } from "./types";
+import type {
+  QuizDetails,
+  CreateQuizPayload,
+  QuizListItem,
+  ReactionResult,
+} from "./types";
 import { getStoredToken } from "@/hooks/authStorage";
 
 /**
@@ -91,33 +96,45 @@ export const fetchQuizzesByCourse = async (
   }
 };
 
-/**
- * Like a quiz (TODO: Implement when backend API is ready)
- * @param quizId - The ID of the quiz to like
- */
-export const likeQuiz = async (_quizId: string): Promise<void> => {
+// Matches the backend's Domain.Quizzes.Enums.ReactionType (Dislike = 0, Like = 1).
+const ReactionType = { Dislike: 0, Like: 1 } as const;
+
+// The backend derives which user is reacting from the authenticated session -
+// it never trusts a client-supplied user id - and returns the quiz's updated
+// like/dislike counts so the caller can sync both counters at once (switching
+// from Like to Dislike changes both, not just the one that was clicked).
+const addReaction = async (
+  quizId: string,
+  reactionType: (typeof ReactionType)[keyof typeof ReactionType]
+): Promise<ReactionResult> => {
   try {
-    // TODO: Implement when backend API is ready
-    // await apiClient.post(`/quizzes/${quizId}/like`);
+    const response = await apiClient.post<ReactionResult>(
+      `/quizzes/${quizId}/reactions`,
+      { reactionType }
+    );
+    return response.data;
   } catch (err) {
-    console.error("Failed to like quiz:", err);
-    throw new Error("Failed to like quiz");
+    const error = err as {
+      response?: { data?: { errors?: { description?: string }[] } };
+    };
+    const message = error.response?.data?.errors?.[0]?.description;
+    throw new Error(message || "Failed to update your reaction. Please try again.");
   }
 };
 
 /**
- * Dislike a quiz (TODO: Implement when backend API is ready)
+ * Like a quiz. Returns the quiz's updated like/dislike counts.
+ * @param quizId - The ID of the quiz to like
+ */
+export const likeQuiz = (quizId: string): Promise<ReactionResult> =>
+  addReaction(quizId, ReactionType.Like);
+
+/**
+ * Dislike a quiz. Returns the quiz's updated like/dislike counts.
  * @param quizId - The ID of the quiz to dislike
  */
-export const dislikeQuiz = async (_quizId: string): Promise<void> => {
-  try {
-    // TODO: Implement when backend API is ready
-    // await apiClient.post(`/quizzes/${quizId}/dislike`);
-  } catch (err) {
-    console.error("Failed to dislike quiz:", err);
-    throw new Error("Failed to dislike quiz");
-  }
-};
+export const dislikeQuiz = (quizId: string): Promise<ReactionResult> =>
+  addReaction(quizId, ReactionType.Dislike);
 
 /**
  * Submit quiz score to the server

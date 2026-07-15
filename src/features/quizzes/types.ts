@@ -64,6 +64,11 @@ export type QuizDetails = {
   questions: QuizQuestion[];
 };
 
+export type ReactionResult = {
+  likes: number;
+  dislikes: number;
+};
+
 export type UserAnswer = {
   questionId: number;
   selectedChoiceIds?: number[];
