@@ -14,7 +14,10 @@ import { QuizImageViewer } from "./QuizImageViewer";
 type QuizReviewSectionProps = {
   questions: QuizQuestion[];
   userAnswers: Map<number, UserAnswer>;
-  isQuestionCorrect: (question: QuizQuestion) => boolean;
+  isQuestionCorrect: (
+    question: QuizQuestion,
+    userAnswer?: UserAnswer
+  ) => boolean;
 };
 
 export function QuizReviewSection({
@@ -24,7 +27,9 @@ export function QuizReviewSection({
 }: QuizReviewSectionProps) {
   const [viewingImage, setViewingImage] = useState<string | null>(null);
 
-  const correctCount = questions.filter((q) => isQuestionCorrect(q)).length;
+  const correctCount = questions.filter((q) =>
+    isQuestionCorrect(q, userAnswers.get(q.id))
+  ).length;
   const incorrectCount = questions.length - correctCount;
 
   return (
@@ -50,8 +55,8 @@ export function QuizReviewSection({
       </div>
 
       {questions.map((question, index) => {
-        const isCorrect = isQuestionCorrect(question);
         const userAnswer = userAnswers.get(question.id);
+        const isCorrect = isQuestionCorrect(question, userAnswer);
         const correctChoices = question.choices.filter((c) => c.isCorrect);
 
         return (

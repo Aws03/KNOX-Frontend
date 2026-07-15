@@ -146,8 +146,7 @@ export const submitQuizScore = async (
   score: number
 ): Promise<void> => {
   try {
-    await apiClient.post("/quizzes/submit", {
-      quizId: parseInt(quizId),
+    await apiClient.post(`/quizzes/${quizId}/attempts`, {
       score: Math.round(score),
     });
   } catch (err) {
