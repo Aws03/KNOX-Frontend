@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getCourseMaterials, GetMyCourseContent } from "../api";
 import type { CourseMaterialsResponse } from "../types";
 
@@ -26,30 +26,30 @@ export function useCourseMaterials(
   );
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadRootMaterials() {
-      if (!courseId) return;
+  const loadRootMaterials = useCallback(async () => {
+    if (!courseId) return;
 
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        const data = isManagementMode
-          ? await GetMyCourseContent(courseId)
-          : await getCourseMaterials(courseId);
-        setContents(data);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load materials"
-        );
-        console.error("Error loading materials:", err);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const data = isManagementMode
+        ? await GetMyCourseContent(courseId)
+        : await getCourseMaterials(courseId);
+      setContents(data);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load materials"
+      );
+      console.error("Error loading materials:", err);
+    } finally {
+      setLoading(false);
     }
-
-    loadRootMaterials();
   }, [courseId, isManagementMode]);
 
-  return { loading, contents, error };
+  useEffect(() => {
+    loadRootMaterials();
+  }, [loadRootMaterials]);
+
+  return { loading, contents, error, refetch: loadRootMaterials };
 }

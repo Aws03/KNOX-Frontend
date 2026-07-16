@@ -1,10 +1,13 @@
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import { Card } from "@/shared/ui/card";
 import { Loader2 } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useCourseMaterials } from "../hooks/useCourseMaterials";
 import { MaterialExplorerHeader } from "../components/MaterialExplorerHeader";
 import { MaterialExplorerContent } from "../components/MaterialExplorerContent";
+import { CreateFolderDialog } from "../components/CreateFolderDialog";
+import { UploadMaterialDialog } from "../components/UploadMaterialDialog";
 import type { FolderItem, MaterialItem } from "../types";
 
 interface MaterialExplorerProps {
@@ -20,18 +23,21 @@ export default function MaterialExplorerPage({
   // Check if user can see management UI
   const isManagementMode = mode === "manage" && canManageContent();
 
-  const { loading, contents, error } = useCourseMaterials({
+  const { loading, contents, error, refetch } = useCourseMaterials({
     courseId,
     isManagementMode,
   });
 
+  const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
+  const [isMaterialDialogOpen, setIsMaterialDialogOpen] = useState(false);
+
   // Management action handlers
   const handleAddFolder = () => {
-    // TODO: Open add folder dialog
+    setIsFolderDialogOpen(true);
   };
 
   const handleAddMaterial = () => {
-    // TODO: Open add material dialog
+    setIsMaterialDialogOpen(true);
   };
 
   const handleEditFolder = (_folder: FolderItem) => {
@@ -98,6 +104,19 @@ export default function MaterialExplorerPage({
           onDeleteMaterial={handleDeleteMaterial}
         />
       </div>
+
+      <CreateFolderDialog
+        isOpen={isFolderDialogOpen}
+        onClose={() => setIsFolderDialogOpen(false)}
+        courseId={courseId}
+        onCreated={refetch}
+      />
+      <UploadMaterialDialog
+        isOpen={isMaterialDialogOpen}
+        onClose={() => setIsMaterialDialogOpen(false)}
+        courseId={courseId}
+        onCreated={refetch}
+      />
     </Card>
   );
 }

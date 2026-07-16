@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   getCourseContents,
   GetMyCourseContent,
@@ -21,6 +21,7 @@ interface UseFolderContentsReturn {
   contents: FolderContentsResponse | null;
   loading: boolean;
   error: string | null;
+  refetch: () => Promise<void>;
   handleDeleteFolder: (folderId: number) => Promise<void>;
   handleDeleteMaterial: (materialId: number) => Promise<void>;
   handleEditFolder: (folder: FolderItem) => void;
@@ -36,28 +37,28 @@ export function useFolderContents({
   const [contents, setContents] = useState<FolderContentsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadFolderContents() {
-      if (!courseId) return;
+  const loadFolderContents = useCallback(async () => {
+    if (!courseId) return;
 
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        const data = isManagementMode
-          ? await GetMyCourseContent(courseId, folderId)
-          : await getCourseContents(courseId, folderId);
-        setContents(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load folder");
-        console.error("Error loading folder contents:", err);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const data = isManagementMode
+        ? await GetMyCourseContent(courseId, folderId)
+        : await getCourseContents(courseId, folderId);
+      setContents(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load folder");
+      console.error("Error loading folder contents:", err);
+    } finally {
+      setLoading(false);
     }
-
-    loadFolderContents();
   }, [courseId, folderId, isManagementMode]);
+
+  useEffect(() => {
+    loadFolderContents();
+  }, [loadFolderContents]);
 
   const handleDeleteFolder = async (folderIdToDelete: number) => {
     if (!confirm("Are you sure you want to delete this folder?")) return;
@@ -65,10 +66,7 @@ export function useFolderContents({
 
     try {
       await deleteFolder(folderIdToDelete);
-      const data = isManagementMode
-        ? await GetMyCourseContent(courseId, folderId)
-        : await getCourseContents(courseId, folderId);
-      setContents(data);
+      await loadFolderContents();
     } catch (err) {
       console.error("Error deleting folder:", err);
       alert("Failed to delete folder");
@@ -81,10 +79,7 @@ export function useFolderContents({
 
     try {
       await deleteMaterial(materialId);
-      const data = isManagementMode
-        ? await GetMyCourseContent(courseId, folderId)
-        : await getCourseContents(courseId, folderId);
-      setContents(data);
+      await loadFolderContents();
     } catch (err) {
       console.error("Error deleting material:", err);
       alert("Failed to delete material");
@@ -103,6 +98,7 @@ export function useFolderContents({
     contents,
     loading,
     error,
+    refetch: loadFolderContents,
     handleDeleteFolder,
     handleDeleteMaterial,
     handleEditFolder,

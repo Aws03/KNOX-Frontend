@@ -222,7 +222,7 @@ const ManageResourcesPage = () => {
 
     setSubmitting(true);
     try {
-      await apiClient.post(`/courses/${courseId}/info/resources`, formData);
+      await apiClient.post(`/courses/${courseId}/resources`, formData);
 
       setIsAddDialogOpen(false);
       resetForm();
@@ -245,7 +245,7 @@ const ManageResourcesPage = () => {
     setSubmitting(true);
     try {
       await apiClient.put(
-        `/courses/${courseId}/info/resources/${selectedResource.id}`,
+        `/courses/${courseId}/resources/${selectedResource.id}`,
         formData
       );
 
@@ -271,7 +271,7 @@ const ManageResourcesPage = () => {
     setSubmitting(true);
     try {
       await apiClient.delete(
-        `/courses/${courseId}/info/resources/${selectedResource.id}`
+        `/courses/${courseId}/resources/${selectedResource.id}`
       );
 
       setIsDeleteDialogOpen(false);

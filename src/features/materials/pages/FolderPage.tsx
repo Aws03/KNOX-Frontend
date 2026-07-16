@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useFolderContents } from "../hooks/useFolderContents";
 import { LoadingState, ErrorState } from "../components/PageStates";
@@ -6,6 +7,8 @@ import { FolderPageHeader } from "../components/FolderPageHeader";
 import { FoldersList } from "../components/FoldersList";
 import { MaterialsList } from "../components/MaterialsList";
 import { EmptyState } from "../components/EmptyState";
+import { CreateFolderDialog } from "../components/CreateFolderDialog";
+import { UploadMaterialDialog } from "../components/UploadMaterialDialog";
 
 interface FolderPageProps {
   mode?: "public" | "manage";
@@ -25,18 +28,22 @@ export default function FolderPage({ mode = "public" }: FolderPageProps) {
     contents,
     loading,
     error,
+    refetch,
     handleDeleteFolder,
     handleDeleteMaterial,
     handleEditFolder,
     handleEditMaterial,
   } = useFolderContents({ courseId, folderId, isManagementMode });
 
+  const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
+  const [isMaterialDialogOpen, setIsMaterialDialogOpen] = useState(false);
+
   const handleAddFolder = () => {
-    // TODO: Implement add folder dialog
+    setIsFolderDialogOpen(true);
   };
 
   const handleAddMaterial = () => {
-    // TODO: Implement add material dialog
+    setIsMaterialDialogOpen(true);
   };
 
   if (loading) return <LoadingState />;
@@ -74,6 +81,21 @@ export default function FolderPage({ mode = "public" }: FolderPageProps) {
 
         {isEmpty && <EmptyState />}
       </div>
+
+      <CreateFolderDialog
+        isOpen={isFolderDialogOpen}
+        onClose={() => setIsFolderDialogOpen(false)}
+        courseId={courseId!}
+        parentFolderId={folderId ? parseInt(folderId, 10) : undefined}
+        onCreated={refetch}
+      />
+      <UploadMaterialDialog
+        isOpen={isMaterialDialogOpen}
+        onClose={() => setIsMaterialDialogOpen(false)}
+        courseId={courseId!}
+        folderId={folderId ? parseInt(folderId, 10) : undefined}
+        onCreated={refetch}
+      />
     </div>
   );
 }
