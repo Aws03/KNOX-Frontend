@@ -64,3 +64,14 @@ export interface Major {
 
 // Role types
 export type UserRole = "SuperAdmin" | "Admin" | "Writer" | "User";
+
+// Writer statistics (dashboard)
+export interface WriterStatistics {
+  totalMaterials: number;
+  totalQuizzes: number;
+  totalQuizAttempts: number;
+  totalQuizLikes: number;
+  totalQuizDislikes: number;
+  totalQuizQuestions: number;
+  totalQuizChoices: number;
+}

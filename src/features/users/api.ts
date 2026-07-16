@@ -1,5 +1,10 @@
 import { apiClient } from "@/lib/api/apiClient";
-import type { UserResponse, UserFilters, UserRole } from "./types";
+import type {
+  UserResponse,
+  UserFilters,
+  UserRole,
+  WriterStatistics,
+} from "./types";
 
 /**
  * Fetches paginated user list with optional filters
@@ -114,4 +119,17 @@ export const toggleUserStatus = async (
   } else {
     await activateUser(userId);
   }
+};
+
+/**
+ * Fetches writer statistics (materials/quizzes authored, likes, attempts, ...)
+ * @param writerId - The writer's domain user id (User.domainUserId)
+ */
+export const fetchWriterStatistics = async (
+  writerId: number
+): Promise<WriterStatistics> => {
+  const response = await apiClient.get<WriterStatistics>(
+    `/Users/${writerId}/writer-statistics`
+  );
+  return response.data;
 };

@@ -75,7 +75,7 @@ const CTASection = () => {
                 <Button
                   size="lg"
                   className="group relative overflow-hidden bg-primary px-8 py-6 text-lg font-semibold shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:scale-105"
-                  onClick={() => navigate("/register")}
+                  onClick={() => navigate("/auth/register")}
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     Get Started Free
@@ -86,7 +86,7 @@ const CTASection = () => {
                   size="lg"
                   variant="outline"
                   className="px-8 py-6 text-lg font-semibold backdrop-blur-sm transition-all hover:bg-primary/5 hover:scale-105"
-                  onClick={() => navigate("/materials")}
+                  onClick={() => navigate("/courses")}
                 >
                   Browse Materials
                 </Button>
