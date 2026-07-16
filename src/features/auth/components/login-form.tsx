@@ -12,11 +12,21 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { useAuth } from "@/app/providers/useAuth";
 
-const LoginForm = () => {
+type LoginFormProps = {
+  email: string;
+  password: string;
+  onEmailChange: (email: string) => void;
+  onPasswordChange: (password: string) => void;
+};
+
+const LoginForm = ({
+  email,
+  password,
+  onEmailChange,
+  onPasswordChange,
+}: LoginFormProps) => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +82,7 @@ const LoginForm = () => {
           id="userEmail"
           placeholder={t("auth.login.emailPlaceholder")}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => onEmailChange(e.target.value)}
           required
           disabled={isLoading}
         />
@@ -90,7 +100,7 @@ const LoginForm = () => {
             placeholder={t("auth.login.passwordPlaceholder")}
             className="pr-9"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => onPasswordChange(e.target.value)}
             required
             disabled={isLoading}
           />

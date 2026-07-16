@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/shared/ui/button";
 import {
   Card,
@@ -16,10 +13,10 @@ import { Separator } from "@/shared/ui/separator";
 import Logo from "@/assets/logo";
 import AuthBackgroundShape from "@/assets/svg/auth-background-shape";
 import LoginForm from "@/features/auth/components/login-form";
-import { useAuth } from "@/app/providers/useAuth";
 
 // Demo credentials for the "Quick Login" buttons - the seeded SuperAdmin
-// account plus a student account (seeded separately) for a one-click demo.
+// account plus a student account (seeded separately). Clicking a button only
+// fills the form fields; the user still clicks the real Sign In button.
 const QUICK_LOGIN_CREDENTIALS = {
   user: { email: "student@knox.com", password: "Student@123456" },
   admin: { email: "admin@knox.com", password: "Admin@123456" },
@@ -27,37 +24,13 @@ const QUICK_LOGIN_CREDENTIALS = {
 
 const LoginPage = () => {
   const { t } = useTranslation();
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [quickLoginRole, setQuickLoginRole] = useState<
-    "user" | "admin" | null
-  >(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleQuickLogin = async (role: "user" | "admin") => {
-    setQuickLoginRole(role);
-    try {
-      const { email, password } = QUICK_LOGIN_CREDENTIALS[role];
-      await login(email, password);
-      navigate("/", {
-        replace: true,
-        state: {
-          toast: {
-            type: "success" as const,
-            title: t("auth.login.success"),
-            description: t("auth.login.welcomeBack"),
-          },
-        },
-      });
-    } catch (err) {
-      console.error("Quick login error:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : t("auth.login.loginFailed");
-      toast.error(t("auth.login.loginFailed"), {
-        description: errorMessage,
-      });
-    } finally {
-      setQuickLoginRole(null);
-    }
+  const handleQuickLogin = (role: "user" | "admin") => {
+    const credentials = QUICK_LOGIN_CREDENTIALS[role];
+    setEmail(credentials.email);
+    setPassword(credentials.password);
   };
 
   return (
@@ -86,26 +59,16 @@ const LoginPage = () => {
             <Button
               variant="outline"
               className="grow"
-              disabled={quickLoginRole !== null}
               onClick={() => handleQuickLogin("user")}
             >
-              {quickLoginRole === "user" ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("auth.login.quickLogin.user")
-              )}
+              {t("auth.login.quickLogin.user")}
             </Button>
             <Button
               variant="outline"
               className="grow"
-              disabled={quickLoginRole !== null}
               onClick={() => handleQuickLogin("admin")}
             >
-              {quickLoginRole === "admin" ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("auth.login.quickLogin.admin")
-              )}
+              {t("auth.login.quickLogin.admin")}
             </Button>
           </div>
 
@@ -117,7 +80,12 @@ const LoginPage = () => {
 
           {/* Login Form */}
           <div className="space-y-4">
-            <LoginForm />
+            <LoginForm
+              email={email}
+              password={password}
+              onEmailChange={setEmail}
+              onPasswordChange={setPassword}
+            />
 
             <p className="text-muted-foreground text-center">
               {t("auth.login.noAccount")}{" "}
