@@ -42,7 +42,7 @@ export const AssignRoleDialog = ({
         <DialogHeader>
           <DialogTitle>Assign Role</DialogTitle>
           <DialogDescription>
-            Select a role to assign to {user?.name.value}
+            Select a role to assign to {user?.name}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -100,7 +100,7 @@ export const ToggleStatusDialog = ({
           </DialogTitle>
           <DialogDescription>
             Are you sure you want to {user?.isActive ? "block" : "activate"}{" "}
-            {user?.name.value}?
+            {user?.name}?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

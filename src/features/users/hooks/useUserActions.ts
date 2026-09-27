@@ -52,7 +52,7 @@ export const useUserActions = (onSuccess?: () => void) => {
     try {
       await assignRoleToUser(selectedUser.id, selectedRole as UserRole);
 
-      const userName = selectedUser.name.value;
+      const userName = selectedUser.name;
       const roleName = selectedRole;
       closeAssignRoleDialog();
 
@@ -78,7 +78,7 @@ export const useUserActions = (onSuccess?: () => void) => {
         closeBlockDialog();
 
         toast.success(`User ${action} successfully`, {
-          description: `${user.name.value} has been ${action}.`,
+          description: `${user.name} has been ${action}.`,
         });
 
         onSuccess?.();

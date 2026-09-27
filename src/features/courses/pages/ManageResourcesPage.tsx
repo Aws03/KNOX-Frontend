@@ -32,15 +32,25 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Textarea } from "@/shared/ui/textarea";
 import { Checkbox } from "@/shared/ui/checkbox";
-import { fetchCourseInfo, fetchCourseById } from "@/features/courses/api";
-import { apiClient } from "@/lib/api/apiClient";
+import {
+  fetchCourseInfo,
+  fetchCourseById,
+  createCourseInfo,
+  updateCourseInfo,
+  addCourseResource,
+  updateCourseResource,
+  deleteCourseResource,
+} from "@/features/courses/api";
 import type {
   CourseInfo,
   CourseResource,
   ResourceType,
-  CourseApiResponse,
+  CourseDetails,
   DifficultyLevel,
+  CourseInfoRequest,
+  CourseResourceRequest,
 } from "@/features/courses/types";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 // Resource type options
 const RESOURCE_TYPE_OPTIONS: { value: ResourceType; label: string }[] = [
@@ -65,30 +75,13 @@ const DIFFICULTY_OPTIONS: { value: DifficultyLevel; label: string }[] = [
   { value: "Hard", label: "Hard" },
 ];
 
-// Form state interface
-interface ResourceFormData {
-  title: string;
-  type: ResourceType;
-  url: string;
-  description: string;
-  hasDemonstrationVideo: boolean;
-  demonstrationVideoUrl: string;
-}
-
-interface CourseInfoFormData {
-  difficultyLevel: DifficultyLevel;
-  description: string;
-  demonstrationVideoUrl: string;
-  demonstrationVideoTitle: string;
-}
-
 const ManageResourcesPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [courseInfo, setCourseInfo] = useState<CourseInfo | null>(null);
-  const [course, setCourse] = useState<CourseApiResponse | null>(null);
+  const [course, setCourse] = useState<CourseDetails | null>(null);
   const [resources, setResources] = useState<CourseResource[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [hasCourseInfo, setHasCourseInfo] = useState(false);
@@ -100,7 +93,7 @@ const ManageResourcesPage = () => {
   const [isCourseInfoDialogOpen, setIsCourseInfoDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] =
     useState<CourseResource | null>(null);
-  const [formData, setFormData] = useState<ResourceFormData>({
+  const [formData, setFormData] = useState<CourseResourceRequest>({
     title: "",
     type: "Other",
     url: "",
@@ -108,8 +101,8 @@ const ManageResourcesPage = () => {
     hasDemonstrationVideo: false,
     demonstrationVideoUrl: "",
   });
-  const [courseInfoFormData, setCourseInfoFormData] =
-    useState<CourseInfoFormData>({
+  const [courseInfoFormData, setCourseInfoRequest] =
+    useState<CourseInfoRequest>({
       difficultyLevel: "Moderate",
       description: "",
       demonstrationVideoUrl: "",
@@ -135,7 +128,7 @@ const ManageResourcesPage = () => {
           setResources(infoResponse.resources || []);
           setHasCourseInfo(true);
           // Pre-populate course info form for editing
-          setCourseInfoFormData({
+          setCourseInfoRequest({
             difficultyLevel: infoResponse.difficultyLevel,
             description: infoResponse.description,
             demonstrationVideoUrl: infoResponse.demonstrationVideoUrl || "",
@@ -171,7 +164,7 @@ const ManageResourcesPage = () => {
   };
 
   const resetCourseInfoForm = () => {
-    setCourseInfoFormData({
+    setCourseInfoRequest({
       difficultyLevel: "Moderate",
       description: "",
       demonstrationVideoUrl: "",
@@ -187,10 +180,10 @@ const ManageResourcesPage = () => {
     try {
       if (hasCourseInfo && courseInfo) {
         // Update existing course info
-        await apiClient.put(`/courses/${courseId}/info`, courseInfoFormData);
+        await updateCourseInfo(parseInt(courseId), courseInfoFormData);
       } else {
         // Create new course info
-        await apiClient.post(`/courses/${courseId}/info`, courseInfoFormData);
+        await createCourseInfo(parseInt(courseId), courseInfoFormData);
       }
 
       setIsCourseInfoDialogOpen(false);
@@ -210,7 +203,7 @@ const ManageResourcesPage = () => {
       }
     } catch (err) {
       console.error("Failed to save course info:", err);
-      setError("Failed to save course information");
+      setError(getApiErrorMessage(err, "Failed to save course information"));
     } finally {
       setSubmitting(false);
     }
@@ -222,7 +215,7 @@ const ManageResourcesPage = () => {
 
     setSubmitting(true);
     try {
-      await apiClient.post(`/courses/${courseId}/resources`, formData);
+      await addCourseResource(parseInt(courseId), formData);
 
       setIsAddDialogOpen(false);
       resetForm();
@@ -232,7 +225,7 @@ const ManageResourcesPage = () => {
       setResources(infoResponse.resources || []);
     } catch (err) {
       console.error("Failed to add resource:", err);
-      setError("Failed to add resource");
+      setError(getApiErrorMessage(err, "Failed to add resource"));
     } finally {
       setSubmitting(false);
     }
@@ -244,10 +237,7 @@ const ManageResourcesPage = () => {
 
     setSubmitting(true);
     try {
-      await apiClient.put(
-        `/courses/${courseId}/resources/${selectedResource.id}`,
-        formData
-      );
+      await updateCourseResource(parseInt(courseId), selectedResource.id, formData);
 
       setIsEditDialogOpen(false);
       setSelectedResource(null);
@@ -258,7 +248,7 @@ const ManageResourcesPage = () => {
       setResources(infoResponse.resources || []);
     } catch (err) {
       console.error("Failed to update resource:", err);
-      setError("Failed to update resource");
+      setError(getApiErrorMessage(err, "Failed to update resource"));
     } finally {
       setSubmitting(false);
     }
@@ -270,9 +260,7 @@ const ManageResourcesPage = () => {
 
     setSubmitting(true);
     try {
-      await apiClient.delete(
-        `/courses/${courseId}/resources/${selectedResource.id}`
-      );
+      await deleteCourseResource(parseInt(courseId), selectedResource.id);
 
       setIsDeleteDialogOpen(false);
       setSelectedResource(null);
@@ -282,7 +270,7 @@ const ManageResourcesPage = () => {
       setResources(infoResponse.resources || []);
     } catch (err) {
       console.error("Failed to delete resource:", err);
-      setError("Failed to delete resource");
+      setError(getApiErrorMessage(err, "Failed to delete resource"));
     } finally {
       setSubmitting(false);
     }
@@ -770,7 +758,7 @@ const ManageResourcesPage = () => {
               <Select
                 value={courseInfoFormData.difficultyLevel}
                 onValueChange={(value: DifficultyLevel) =>
-                  setCourseInfoFormData({
+                  setCourseInfoRequest({
                     ...courseInfoFormData,
                     difficultyLevel: value,
                   })
@@ -794,7 +782,7 @@ const ManageResourcesPage = () => {
                 id="course-description"
                 value={courseInfoFormData.description}
                 onChange={(e) =>
-                  setCourseInfoFormData({
+                  setCourseInfoRequest({
                     ...courseInfoFormData,
                     description: e.target.value,
                   })
@@ -811,7 +799,7 @@ const ManageResourcesPage = () => {
                 id="demo-video-title"
                 value={courseInfoFormData.demonstrationVideoTitle}
                 onChange={(e) =>
-                  setCourseInfoFormData({
+                  setCourseInfoRequest({
                     ...courseInfoFormData,
                     demonstrationVideoTitle: e.target.value,
                   })
@@ -825,7 +813,7 @@ const ManageResourcesPage = () => {
                 id="course-demo-url"
                 value={courseInfoFormData.demonstrationVideoUrl}
                 onChange={(e) =>
-                  setCourseInfoFormData({
+                  setCourseInfoRequest({
                     ...courseInfoFormData,
                     demonstrationVideoUrl: e.target.value,
                   })

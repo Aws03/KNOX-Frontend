@@ -19,7 +19,7 @@ export type QuestionTypeString =
 export type Choice = {
   id: string;
   text: string;
-  imageUrl: string | null;
+  imageUrl?: string | null;
   isCorrect: boolean;
   uploadingImage: boolean;
 };
@@ -27,7 +27,7 @@ export type Choice = {
 export type Question = {
   id: string;
   text: string;
-  imageUrl: string | null;
+  imageUrl?: string | null;
   type: QuestionTypeValue;
   choices: Choice[];
   uploadingImage: boolean;
@@ -39,7 +39,7 @@ export type QuestionChoice = {
   questionId: number;
   text: string;
   isCorrect: boolean;
-  imageUrl: string | null;
+  imageUrl?: string | null;
 };
 
 export type QuizQuestion = {
@@ -47,7 +47,7 @@ export type QuizQuestion = {
   quizId: number;
   type: QuestionTypeString;
   text: string;
-  imageUrl: string | null;
+  imageUrl?: string | null;
   choices: QuestionChoice[];
 };
 
@@ -57,7 +57,7 @@ export type QuizDetails = {
   writerId: number;
   writerName: string;
   title: string;
-  description: string;
+  description?: string;
   likes: number;
   dislikes: number;
   createdAt: string;
@@ -87,13 +87,13 @@ export type QuizListItem = {
 // Create Quiz Payload Types
 export type CreateQuizChoicePayload = {
   text: string;
-  imageUrl: string | null;
+  imageUrl?: string | null;
   isCorrect: boolean;
 };
 
 export type CreateQuizQuestionPayload = {
   text: string;
-  imageUrl: string | null;
+  imageUrl?: string | null;
   type: QuestionTypeValue;
   choices: CreateQuizChoicePayload[];
 };

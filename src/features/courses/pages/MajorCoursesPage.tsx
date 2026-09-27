@@ -9,9 +9,8 @@ import {
 } from "@/shared/ui/dialog";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { apiClient } from "@/lib/api/apiClient";
-import { fetchCourseByCode } from "@/features/courses/api";
-import type { CourseApiResponse } from "@/features/courses/types";
+import { assignCourseToMajor, createCourse, fetchCourseByCode } from "@/features/courses/api";
+import type { CourseDetails } from "@/features/courses/types";
 import { toast } from "sonner";
 import { useParams, useNavigate } from "react-router-dom";
 import SmartPagination from "@/shared/components/pagination/SmartPagination";
@@ -44,7 +43,7 @@ const MajorCoursesPage = () => {
   const [addError, setAddError] = useState("");
   const [step, setStep] = useState(1); // 1: enter code, 2: form
   const [codeInput, setCodeInput] = useState("");
-  const [existingCourse, setExistingCourse] = useState<CourseApiResponse | null>(null);
+  const [existingCourse, setExistingCourse] = useState<CourseDetails | null>(null);
   const [form, setForm] = useState({
     courseName: "",
     courseCode: "",
@@ -108,9 +107,9 @@ const MajorCoursesPage = () => {
       setExistingCourse(course);
       setForm({
         courseName: course.courseName,
-        courseCode: course.courseCode,
-        description: course.description,
-        credits: course.credits,
+        courseCode: course.courseCode ?? codeInput.trim().toUpperCase(),
+        description: course.description ?? "",
+        credits: course.credits ?? 0,
         requirementType: "1",
         requirementNature: "1",
       });
@@ -147,12 +146,9 @@ const MajorCoursesPage = () => {
       };
       if (existingCourse) {
         // The course already exists (e.g. in another major): link it instead of creating a duplicate.
-        await apiClient.post(`/courses/${existingCourse.id}/assign-to-major`, {
-          majorId: majorIdNum,
-          ...requirement,
-        });
+        await assignCourseToMajor(existingCourse.id, { majorId: majorIdNum, ...requirement });
       } else {
-        await apiClient.post("/courses", {
+        await createCourse({
           majorId: majorIdNum,
           ...form,
           credits: Number(form.credits),

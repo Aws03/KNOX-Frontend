@@ -1,15 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   getCourseContents,
-  GetMyCourseContent,
+  getMyCourseContents,
   deleteFolder,
   deleteMaterial,
 } from "../api";
-import type {
-  FolderContentsResponse,
-  FolderItem,
-  MaterialItem,
-} from "../types";
+import type { FolderContentsResponse } from "../types";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 interface UseFolderContentsProps {
   courseId: string | undefined;
@@ -24,8 +21,6 @@ interface UseFolderContentsReturn {
   refetch: () => Promise<void>;
   handleDeleteFolder: (folderId: number) => Promise<void>;
   handleDeleteMaterial: (materialId: number) => Promise<void>;
-  handleEditFolder: (folder: FolderItem) => void;
-  handleEditMaterial: (material: MaterialItem) => void;
 }
 
 export function useFolderContents({
@@ -45,11 +40,11 @@ export function useFolderContents({
 
     try {
       const data = isManagementMode
-        ? await GetMyCourseContent(courseId, folderId)
+        ? await getMyCourseContents(courseId, folderId)
         : await getCourseContents(courseId, folderId);
       setContents(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load folder");
+      setError(getApiErrorMessage(err, "Failed to load folder"));
       console.error("Error loading folder contents:", err);
     } finally {
       setLoading(false);
@@ -61,7 +56,7 @@ export function useFolderContents({
   }, [loadFolderContents]);
 
   const handleDeleteFolder = async (folderIdToDelete: number) => {
-    if (!confirm("Are you sure you want to delete this folder?")) return;
+    if (!confirm("Delete this folder? Its sub-folders are deleted too; files inside move to the course root.")) return;
     if (!courseId) return;
 
     try {
@@ -69,7 +64,7 @@ export function useFolderContents({
       await loadFolderContents();
     } catch (err) {
       console.error("Error deleting folder:", err);
-      alert("Failed to delete folder");
+      alert(getApiErrorMessage(err, "Failed to delete folder"));
     }
   };
 
@@ -82,17 +77,11 @@ export function useFolderContents({
       await loadFolderContents();
     } catch (err) {
       console.error("Error deleting material:", err);
-      alert("Failed to delete material");
+      alert(getApiErrorMessage(err, "Failed to delete material"));
     }
   };
 
-  const handleEditFolder = (_folder: FolderItem) => {
-    // TODO: Implement edit folder dialog
-  };
 
-  const handleEditMaterial = (_material: MaterialItem) => {
-    // TODO: Implement edit material dialog
-  };
 
   return {
     contents,
@@ -101,7 +90,5 @@ export function useFolderContents({
     refetch: loadFolderContents,
     handleDeleteFolder,
     handleDeleteMaterial,
-    handleEditFolder,
-    handleEditMaterial,
   };
 }

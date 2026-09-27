@@ -41,14 +41,15 @@ import {
   SidebarTrigger,
 } from "@/shared/ui/sidebar";
 
-import ProfileDropdown from "@/features/dashboard/componenets/dropdown-profile";
+import ProfileDropdown from "@/features/dashboard/components/dropdown-profile";
 import { Outlet } from "react-router-dom";
+import { getInitials } from "@/lib/utils";
 
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isSuperAdmin, canManageContent, hasRole } = useUserRole();
+  const { isSuperAdmin, isAdmin, canManageContent, hasRole } = useUserRole();
   const [majorName, setMajorName] = useState<string | null>(null);
   const { i18n } = useTranslation();
 
@@ -56,37 +57,26 @@ const DashboardLayout = () => {
   const isRTL = i18n.language === "ar";
   const sidebarSide = isRTL ? "right" : "left";
 
-  // Generate initials from user name
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   const displayName = user?.fullName || user?.name || "User";
   const avatarUrl = user?.profilePictureUrl || undefined;
   const initials = getInitials(displayName);
 
-  // Redirect non-SuperAdmin users to their faculty page
+  // The dashboard home (platform statistics) is SuperAdmin-only and the university list is for
+  // admins (as in the API); everyone else lands on their own faculty.
   useEffect(() => {
-    if (!isSuperAdmin && user) {
-      // Redirect from /dashboard root or /dashboard/universities to their faculty
-      if (
-        location.pathname === "/dashboard" ||
-        location.pathname === "/dashboard/universities"
-      ) {
-        if (user.universityId && user.facultyId) {
-          navigate(
-            `/dashboard/universities/${user.universityId}/faculties/${user.facultyId}`,
-            { replace: true }
-          );
-        }
-      }
+    if (!user) return;
+    const ownFaculty =
+      user.universityId && user.facultyId
+        ? `/dashboard/universities/${user.universityId}/faculties/${user.facultyId}`
+        : null;
+    const path = location.pathname;
+    if (path === "/dashboard" && !isSuperAdmin) {
+      const target = isAdmin ? "/dashboard/universities" : ownFaculty;
+      if (target) navigate(target, { replace: true });
+    } else if (path === "/dashboard/universities" && !isAdmin && ownFaculty) {
+      navigate(ownFaculty, { replace: true });
     }
-  }, [location.pathname, isSuperAdmin, user, navigate]);
+  }, [location.pathname, isSuperAdmin, isAdmin, user, navigate]);
 
   // Fetch major name from URL if present
   useEffect(() => {
@@ -164,11 +154,11 @@ const DashboardLayout = () => {
       breadcrumbs.push({ label: "Content Management" });
 
       if (parts.length === 2) {
-        // /dashboard/universities - SuperAdmin view
+        // /dashboard/universities - admin view
         breadcrumbs.push({ label: "All Universities" });
       } else if (parts.length === 3) {
         // /dashboard/universities/:id - University details
-        if (isSuperAdmin) {
+        if (isAdmin) {
           breadcrumbs.push({
             label: "Universities",
             href: "/dashboard/universities",
@@ -178,7 +168,7 @@ const DashboardLayout = () => {
       } else if (parts.length >= 5 && parts[3] === "faculties") {
         // /dashboard/universities/:id/faculties/:facultyId
         const universityId = parts[2];
-        if (isSuperAdmin) {
+        if (isAdmin) {
           breadcrumbs.push({
             label: "Universities",
             href: "/dashboard/universities",
@@ -240,7 +230,7 @@ const DashboardLayout = () => {
                       <SidebarMenuButton
                         isActive={getActivePage() === "universities"}
                         onClick={() => {
-                          if (isSuperAdmin) {
+                          if (isAdmin) {
                             navigate("/dashboard/universities");
                           } else if (user?.universityId && user?.facultyId) {
                             navigate(
@@ -255,8 +245,8 @@ const DashboardLayout = () => {
                     </SidebarMenuItem>
                   )}
 
-                  {/* Manage Users - SuperAdmin only */}
-                  {isSuperAdmin && (
+                  {/* Manage Users - Admin, SuperAdmin */}
+                  {isAdmin && (
                     <SidebarMenuItem>
                       <SidebarMenuButton
                         isActive={getActivePage() === "users"}
@@ -350,31 +340,6 @@ const DashboardLayout = () => {
           <main className="mx-auto size-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
             <Outlet />
           </main>
-          {/* <footer>
-            <div className="text-muted-foreground mx-auto flex size-full max-w-7xl items-center justify-between gap-3 px-4 py-3 max-sm:flex-col sm:gap-6 sm:px-6">
-              <p className="text-sm text-balance max-sm:text-center">
-                {`©${new Date().getFullYear()}`}{" "}
-                <a href="#" className="text-primary">
-                  Uni-Hub
-                </a>
-                , Empowering students worldwide
-              </p>
-              <div className="flex items-center gap-5">
-                <a href="#">
-                  <FacebookIcon className="size-4" />
-                </a>
-                <a href="#">
-                  <InstagramIcon className="size-4" />
-                </a>
-                <a href="#">
-                  <LinkedinIcon className="size-4" />
-                </a>
-                <a href="#">
-                  <TwitterIcon className="size-4" />
-                </a>
-              </div>
-            </div>
-          </footer> */}
         </div>
       </SidebarProvider>
     </div>

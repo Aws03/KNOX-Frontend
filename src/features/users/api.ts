@@ -5,6 +5,7 @@ import type {
   UserRole,
   WriterStatistics,
 } from "./types";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 /**
  * Fetches paginated user list with optional filters
@@ -49,7 +50,7 @@ export const fetchUsers = async (
     return response.data;
   } catch (error) {
     console.error("Failed to fetch users:", error);
-    throw new Error("Failed to fetch users. Please try again later.");
+    throw new Error(getApiErrorMessage(error, "Failed to fetch users. Please try again later."));
   }
 };
 
@@ -62,7 +63,7 @@ export const fetchUserRoles = async (): Promise<UserRole[]> => {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch roles:", error);
-    throw new Error("Failed to fetch roles. Please try again later.");
+    throw new Error(getApiErrorMessage(error, "Failed to fetch roles. Please try again later."));
   }
 };
 
@@ -79,7 +80,7 @@ export const assignRoleToUser = async (
     });
   } catch (error) {
     console.error("Failed to assign role:", error);
-    throw new Error("Failed to assign role. Please try again later.");
+    throw new Error(getApiErrorMessage(error, "Failed to assign role. Please try again later."));
   }
 };
 
@@ -91,7 +92,7 @@ export const blockUser = async (userId: number): Promise<void> => {
     await apiClient.post(`/users/${userId}/block`);
   } catch (error) {
     console.error("Failed to block user:", error);
-    throw new Error("Failed to block user. Please try again later.");
+    throw new Error(getApiErrorMessage(error, "Failed to block user. Please try again later."));
   }
 };
 
@@ -103,7 +104,7 @@ export const activateUser = async (userId: number): Promise<void> => {
     await apiClient.post(`/users/${userId}/activate`);
   } catch (error) {
     console.error("Failed to activate user:", error);
-    throw new Error("Failed to activate user. Please try again later.");
+    throw new Error(getApiErrorMessage(error, "Failed to activate user. Please try again later."));
   }
 };
 

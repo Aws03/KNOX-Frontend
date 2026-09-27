@@ -27,8 +27,9 @@ import type {
   CourseInfo,
   CourseResource,
   ResourceType,
-  CourseApiResponse,
+  CourseDetails,
 } from "@/features/courses/types";
+import { getApiErrorMessage, getApiErrorStatus } from "@/lib/api/errors";
 
 // Helper function to extract YouTube video ID
 const getYouTubeVideoId = (url: string): string | null => {
@@ -261,7 +262,7 @@ const CourseInfoPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [courseInfo, setCourseInfo] = useState<CourseInfo | null>(null);
-  const [course, setCourse] = useState<CourseApiResponse | null>(null);
+  const [course, setCourse] = useState<CourseDetails | null>(null);
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -278,19 +279,20 @@ const CourseInfoPage = () => {
       setError(null);
 
       try {
+        const id = parseInt(courseId);
+        // A course may not have its info written yet (404): show the course anyway.
         const [infoResponse, courseResponse] = await Promise.all([
-          fetchCourseInfo(parseInt(courseId)),
-          fetchCourseById(parseInt(courseId)),
+          fetchCourseInfo(id).catch((err) => {
+            if (getApiErrorStatus(err) === 404) return null;
+            throw err;
+          }),
+          fetchCourseById(id),
         ]);
         setCourseInfo(infoResponse);
         setCourse(courseResponse);
       } catch (err) {
         console.error("Failed to fetch course info:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to load course information"
-        );
+        setError(getApiErrorMessage(err, "Failed to load course information"));
       } finally {
         setLoading(false);
       }

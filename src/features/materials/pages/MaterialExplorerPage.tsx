@@ -9,7 +9,7 @@ import { MaterialExplorerContent } from "../components/MaterialExplorerContent";
 import { CreateFolderDialog } from "../components/CreateFolderDialog";
 import { UploadMaterialDialog } from "../components/UploadMaterialDialog";
 import { deleteFolder, deleteMaterial } from "../api";
-import type { FolderItem, MaterialItem } from "../types";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 interface MaterialExplorerProps {
   mode?: "public" | "manage";
@@ -41,23 +41,16 @@ export default function MaterialExplorerPage({
     setIsMaterialDialogOpen(true);
   };
 
-  const handleEditFolder = (_folder: FolderItem) => {
-    // TODO: Open edit folder dialog
-  };
-
   const handleDeleteFolder = async (folderId: number) => {
-    if (!confirm("Are you sure you want to delete this folder?")) return;
+    if (!confirm("Delete this folder? Its sub-folders are deleted too; files inside move to the course root.")) return;
 
     try {
       await deleteFolder(folderId);
       await refetch();
     } catch (err) {
       console.error("Failed to delete folder:", err);
+      alert(getApiErrorMessage(err, "Failed to delete folder"));
     }
-  };
-
-  const handleEditMaterial = (_material: MaterialItem) => {
-    // TODO: Open edit material dialog
   };
 
   const handleDeleteMaterial = async (materialId: number) => {
@@ -68,6 +61,7 @@ export default function MaterialExplorerPage({
       await refetch();
     } catch (err) {
       console.error("Failed to delete material:", err);
+      alert(getApiErrorMessage(err, "Failed to delete material"));
     }
   };
 
@@ -113,9 +107,7 @@ export default function MaterialExplorerPage({
           materials={contents.materials}
           courseId={courseId}
           isManagementMode={isManagementMode}
-          onEditFolder={handleEditFolder}
           onDeleteFolder={handleDeleteFolder}
-          onEditMaterial={handleEditMaterial}
           onDeleteMaterial={handleDeleteMaterial}
         />
       </div>

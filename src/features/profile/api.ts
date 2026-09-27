@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api/apiClient";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 export interface UpdateProfileData {
   fullName?: string;
@@ -15,7 +16,7 @@ export const updateProfile = async (data: UpdateProfileData): Promise<void> => {
     await apiClient.put("/users/me", data);
   } catch (error) {
     console.error("Failed to update profile:", error);
-    throw new Error("Failed to update profile. Please try again later.");
+    throw new Error(getApiErrorMessage(error, "Failed to update profile. Please try again later."));
   }
 };
 
@@ -41,9 +42,7 @@ export const uploadProfilePicture = async (file: File): Promise<string> => {
     return response.data.profilePictureUrl ?? "";
   } catch (error) {
     console.error("Failed to upload profile picture:", error);
-    throw new Error(
-      "Failed to upload profile picture. Please try again later."
-    );
+    throw new Error(getApiErrorMessage(error, "Failed to upload profile picture. Please try again later."));
   }
 };
 
@@ -55,8 +54,6 @@ export const deleteProfilePicture = async (): Promise<void> => {
     await apiClient.delete("/users/me/profile-picture");
   } catch (error) {
     console.error("Failed to delete profile picture:", error);
-    throw new Error(
-      "Failed to delete profile picture. Please try again later."
-    );
+    throw new Error(getApiErrorMessage(error, "Failed to delete profile picture. Please try again later."));
   }
 };

@@ -1,20 +1,17 @@
 // User related types
 export interface User {
   id: number;
-  name: {
-    value: string;
-  };
-  email: {
-    address: string;
-  };
+  name: string;
+  email: string;
+  profilePictureUrl?: string;
   isActive: boolean;
   isVerified: boolean;
   majorId: number;
-  majorName: string;
-  facultyId: number;
-  facultyName: string;
-  universityId: number;
-  universityName: string;
+  majorName?: string;
+  facultyId?: number;
+  facultyName?: string;
+  universityId?: number;
+  universityName?: string;
 }
 
 export interface UserResponse {

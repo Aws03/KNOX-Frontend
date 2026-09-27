@@ -2,7 +2,7 @@ export type FolderItem = {
   id: number;
   name: string;
   courseId: number;
-  description: string | null;
+  description?: string | null;
 };
 
 export type MaterialItem = {
@@ -13,16 +13,10 @@ export type MaterialItem = {
   contentType: string;
   sizeBytes: number;
   courseId: number;
-  description: string | null;
+  description?: string | null;
 };
 
 export type FolderContentsResponse = {
-  courseId: number;
-  folders: FolderItem[];
-  materials: MaterialItem[];
-};
-
-export type CourseMaterialsResponse = {
   courseId: number;
   folders: FolderItem[];
   materials: MaterialItem[];

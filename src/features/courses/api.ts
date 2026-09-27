@@ -1,23 +1,28 @@
-// Fetch course by code (for add dialog step 1)
-export const fetchCourseByCode = async (courseCode: string) => {
-  const response = await apiClient.get<CourseApiResponse>(
-    `/courses/by-code/${courseCode.toUpperCase()}`
-  );
-  return response.data;
-};
 import { getPaginated } from "@/lib/api/pagination";
 import type { PaginatedResponse } from "@/lib/api/types";
 import { apiClient } from "@/lib/api/apiClient";
 import type {
   Course,
   CourseApiResponse,
+  CourseDetails,
   CourseFilterValues,
   University,
   Faculty,
   Major,
   CourseInfo,
+  CourseInfoRequest,
+  CourseResourceRequest,
+  CreateCourseRequest,
 } from "./types";
 import { REQUIREMENT_NATURE_MAP, REQUIREMENT_TYPE_MAP } from "./types";
+
+// Fetch course by code (for add dialog step 1)
+export const fetchCourseByCode = async (courseCode: string) => {
+  const response = await apiClient.get<CourseDetails>(
+    `/courses/by-code/${courseCode.toUpperCase()}`
+  );
+  return response.data;
+};
 
 // Helper function to map API response to Course UI type.
 // majorName comes from the caller's own selection/context (the by-major
@@ -38,7 +43,7 @@ export const mapApiResponseToCourse = (
 
   return {
     id: apiCourse.id,
-    code: apiCourse.courseCode,
+    code: apiCourse.courseCode ?? "",
     name: apiCourse.courseName,
     major: majorName,
     badges,
@@ -181,9 +186,53 @@ export const fetchCourseInfo = async (
 // Fetch single course by ID
 export const fetchCourseById = async (
   courseId: number
-): Promise<CourseApiResponse> => {
-  const response = await apiClient.get<CourseApiResponse>(
+): Promise<CourseDetails> => {
+  const response = await apiClient.get<CourseDetails>(
     `/courses/${courseId}`
   );
   return response.data;
+};
+
+// ===== Course management (Writer, Admin, SuperAdmin) =====
+
+export const createCourse = async (data: CreateCourseRequest): Promise<void> => {
+  await apiClient.post("/courses", data);
+};
+
+// Links an existing course (e.g. shared with another major) instead of creating a duplicate.
+export const assignCourseToMajor = async (
+  courseId: number,
+  data: { majorId: number; requirementType: number; requirementNature: number }
+): Promise<void> => {
+  await apiClient.post(`/courses/${courseId}/assign-to-major`, data);
+};
+
+export const createCourseInfo = async (courseId: number, data: CourseInfoRequest): Promise<void> => {
+  await apiClient.post(`/courses/${courseId}/info`, data);
+};
+
+export const updateCourseInfo = async (courseId: number, data: CourseInfoRequest): Promise<void> => {
+  await apiClient.put(`/courses/${courseId}/info`, data);
+};
+
+export const addCourseResource = async (courseId: number, data: CourseResourceRequest): Promise<void> => {
+  await apiClient.post(`/courses/${courseId}/resources`, data);
+};
+
+export const updateCourseResource = async (
+  courseId: number,
+  resourceId: number,
+  data: CourseResourceRequest
+): Promise<void> => {
+  await apiClient.put(`/courses/${courseId}/resources/${resourceId}`, data);
+};
+
+export const deleteCourseResource = async (courseId: number, resourceId: number): Promise<void> => {
+  await apiClient.delete(`/courses/${courseId}/resources/${resourceId}`);
+};
+
+// ===== Students =====
+
+export const enrollInCourse = async (courseId: number): Promise<void> => {
+  await apiClient.post(`/courses/${courseId}/enroll`, { notes: null });
 };

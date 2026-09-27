@@ -23,9 +23,9 @@ export function MaterialExplorerContent({
   materials,
   courseId,
   isManagementMode,
-  onEditFolder = () => {},
+  onEditFolder,
+  onEditMaterial,
   onDeleteFolder = () => {},
-  onEditMaterial = () => {},
   onDeleteMaterial = () => {},
 }: MaterialExplorerContentProps) {
   const [playing, setPlaying] = useState<MaterialItem | null>(null);

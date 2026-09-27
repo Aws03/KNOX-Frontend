@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { getCourseMaterials, GetMyCourseContent } from "../api";
-import type { CourseMaterialsResponse } from "../types";
+import { getCourseContents, getMyCourseContents } from "../api";
+import type { FolderContentsResponse } from "../types";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 interface UseCourseMaterialsProps {
   courseId: string | undefined;
@@ -21,7 +22,7 @@ export function useCourseMaterials(
       : false;
 
   const [loading, setLoading] = useState(true);
-  const [contents, setContents] = useState<CourseMaterialsResponse | null>(
+  const [contents, setContents] = useState<FolderContentsResponse | null>(
     null
   );
   const [error, setError] = useState<string | null>(null);
@@ -34,12 +35,12 @@ export function useCourseMaterials(
 
     try {
       const data = isManagementMode
-        ? await GetMyCourseContent(courseId)
-        : await getCourseMaterials(courseId);
+        ? await getMyCourseContents(courseId)
+        : await getCourseContents(courseId);
       setContents(data);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to load materials"
+        getApiErrorMessage(err, "Failed to load materials")
       );
       console.error("Error loading materials:", err);
     } finally {

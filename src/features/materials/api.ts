@@ -2,7 +2,6 @@ import axios from "axios";
 import { apiClient } from "@/lib/api/apiClient";
 import type {
   FolderContentsResponse,
-  CourseMaterialsResponse,
   FolderItem,
   MaterialItem,
 } from "./types";
@@ -21,8 +20,10 @@ export async function getCourseContents(
   return response.data;
 }
 
-//get the course content that the user writed it
-export async function GetMyCourseContent(
+/**
+ * Fetch the course contents the signed-in writer created (management views)
+ */
+export async function getMyCourseContents(
   courseId: string,
   folderId?: string
 ): Promise<FolderContentsResponse> {
@@ -34,22 +35,11 @@ export async function GetMyCourseContent(
 }
 
 /**
- * Fetch root level course materials (no folder)
- */
-export async function getCourseMaterials(
-  courseId: string
-): Promise<CourseMaterialsResponse> {
-  const response = await apiClient.get<CourseMaterialsResponse>(
-    `/courses/${courseId}/contents`
-  );
-  return response.data;
-}
-
-/**
- * Delete a folder by ID
+ * Delete a folder with its sub-folders; materials inside move to the course root.
+ * (Without deleteContents the API refuses to delete a non-empty folder.)
  */
 export async function deleteFolder(folderId: number): Promise<void> {
-  await apiClient.delete(`/folders/${folderId}`);
+  await apiClient.delete(`/folders/${folderId}`, { params: { deleteContents: true } });
 }
 
 /**

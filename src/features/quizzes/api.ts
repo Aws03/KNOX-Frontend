@@ -7,7 +7,7 @@ import type {
   QuizListItem,
   ReactionResult,
 } from "./types";
-import { getStoredToken } from "@/hooks/authStorage";
+import { getStoredToken } from "@/lib/auth/authStorage";
 import { getApiErrorMessage } from "@/lib/api/errors";
 
 /**
@@ -31,7 +31,7 @@ export const uploadTemporaryFile = async (
     return response.data.fileUrl;
   } catch (err) {
     console.error("Failed to upload image:", err);
-    throw new Error("Failed to upload image. Please try again.");
+    throw new Error(getApiErrorMessage(err, "Failed to upload image. Please try again."));
   }
 };
 
@@ -58,8 +58,7 @@ export const fetchQuizById = async (quizId: string): Promise<QuizDetails> => {
     return response.data;
   } catch (err) {
     console.error("Failed to fetch quiz details:", err);
-    const error = err instanceof Error ? err.message : "Failed to load quiz";
-    throw new Error(error);
+    throw new Error(getApiErrorMessage(err, "Failed to load quiz"));
   }
 };
 
@@ -83,8 +82,7 @@ export const fetchQuizzesByCourse = async (
     );
   } catch (err) {
     console.error("Failed to fetch quizzes:", err);
-    const error = err instanceof Error ? err.message : "Failed to load quizzes";
-    throw new Error(error);
+    throw new Error(getApiErrorMessage(err, "Failed to load quizzes"));
   }
 };
 

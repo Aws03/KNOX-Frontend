@@ -7,7 +7,7 @@ import { VideoPlayerDialog } from "./VideoPlayerDialog";
 interface MaterialsListProps {
   materials: MaterialItem[];
   isManagementMode: boolean;
-  onEdit: (material: MaterialItem) => void;
+  onEdit?: (material: MaterialItem) => void;
   onDelete: (materialId: number) => void;
 }
 

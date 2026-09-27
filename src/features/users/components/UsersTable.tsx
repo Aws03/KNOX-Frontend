@@ -104,11 +104,11 @@ export const UsersTable = ({
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="font-medium truncate cursor-default">
-                            {user.name.value}
+                            {user.name}
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{user.name.value}</p>
+                          <p>{user.name}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -120,12 +120,12 @@ export const UsersTable = ({
                           <div className="flex items-center gap-2 text-sm text-muted-foreground cursor-default">
                             <Mail className="size-3.5 shrink-0" />
                             <span className="truncate">
-                              {user.email.address}
+                              {user.email}
                             </span>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{user.email.address}</p>
+                          <p>{user.email}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

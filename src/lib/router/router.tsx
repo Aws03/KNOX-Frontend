@@ -13,6 +13,7 @@ const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
 const RegisterPage = lazy(() => import("@/features/auth/pages/RegisterPage"));
 const ForgotPasswordPage = lazy(() => import("@/features/auth/pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("@/features/auth/pages/ResetPasswordPage"));
+const VerifyAccountPage = lazy(() => import("@/features/auth/pages/VerifyAccountPage"));
 const CoursesPage = lazy(() => import("@/features/courses/pages/CoursesPage"));
 const CourseInfoPage = lazy(() => import("@/features/courses/pages/CourseInfoPage"));
 const FolderPage = lazy(() => import("@/features/materials/pages/FolderPage"));
@@ -31,6 +32,10 @@ const MajorCoursesPage = lazy(() => import("@/features/courses/pages/MajorCourse
 const MaterialExplorerPage = lazy(() => import("@/features/materials/pages/MaterialExplorerPage"));
 const ManageResourcesPage = lazy(() => import("@/features/courses/pages/ManageResourcesPage"));
 
+// Role guards mirror the API's [Authorize(Roles = ...)] attributes (Roles.WriterOrAbove, Roles.AdminOrAbove).
+const CONTENT_MANAGERS = ["Writer", "Admin", "SuperAdmin"];
+const ADMINS = ["Admin", "SuperAdmin"];
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -41,14 +46,40 @@ export const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
       { path: "courses", element: <CoursesPage /> },
       { path: "courses/:courseId/info", element: <CourseInfoPage /> },
+      // Course files are private: listing them hands out signed URLs, so it needs a signed-in user.
       {
         path: "courses/:courseId/materials",
-        element: <MaterialExplorerPage />,
+        element: (
+          <ProtectedRoute>
+            <MaterialExplorerPage />
+          </ProtectedRoute>
+        ),
       },
-      { path: "courses/:courseId/folder/:folderId", element: <FolderPage /> },
+      {
+        path: "courses/:courseId/folder/:folderId",
+        element: (
+          <ProtectedRoute>
+            <FolderPage />
+          </ProtectedRoute>
+        ),
+      },
       { path: "courses/:courseId/quizzes", element: <QuizzesPage /> },
-      { path: "courses/:courseId/quizzes/add", element: <AddQuizPage /> },
-      { path: "courses/:courseId/quizzes/new", element: <QuizQuestionsPage /> },
+      {
+        path: "courses/:courseId/quizzes/add",
+        element: (
+          <ProtectedRoute requiredRoles={CONTENT_MANAGERS}>
+            <AddQuizPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "courses/:courseId/quizzes/new",
+        element: (
+          <ProtectedRoute requiredRoles={CONTENT_MANAGERS}>
+            <QuizQuestionsPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "courses/:courseId/quizzes/:quizId",
         element: <QuizQuestionsPage />,
@@ -79,12 +110,13 @@ export const router = createBrowserRouter([
       { path: "register", element: <RegisterPage /> },
       { path: "forgot-password", element: <ForgotPasswordPage /> },
       { path: "reset-password", element: <ResetPasswordPage /> },
+      { path: "verify-account", element: <VerifyAccountPage /> },
     ],
   },
   {
     path: "/dashboard",
     element: (
-      <ProtectedRoute requiredRoles={["Writer", "Admin", "SuperAdmin"]}>
+      <ProtectedRoute requiredRoles={CONTENT_MANAGERS}>
         <DashboardLayout />
       </ProtectedRoute>
     ),
@@ -100,7 +132,7 @@ export const router = createBrowserRouter([
       {
         path: "universities",
         element: (
-          <ProtectedRoute requiredRoles={["SuperAdmin"]}>
+          <ProtectedRoute requiredRoles={ADMINS}>
             <ManageUniversitiesPage />
           </ProtectedRoute>
         ),
@@ -108,7 +140,7 @@ export const router = createBrowserRouter([
       {
         path: "universities/:id",
         element: (
-          <ProtectedRoute requiredRoles={["SuperAdmin"]}>
+          <ProtectedRoute requiredRoles={ADMINS}>
             <UniversityDetailsPage />
           </ProtectedRoute>
         ),
@@ -145,7 +177,7 @@ export const router = createBrowserRouter([
       {
         path: "users",
         element: (
-          <ProtectedRoute requiredRoles={["SuperAdmin"]}>
+          <ProtectedRoute requiredRoles={ADMINS}>
             <ManageUsersPage />
           </ProtectedRoute>
         ),

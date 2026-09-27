@@ -6,7 +6,7 @@ interface FoldersListProps {
   folders: FolderItem[];
   courseId: string;
   isManagementMode: boolean;
-  onEdit: (folder: FolderItem) => void;
+  onEdit?: (folder: FolderItem) => void;
   onDelete: (folderId: number) => void;
 }
 

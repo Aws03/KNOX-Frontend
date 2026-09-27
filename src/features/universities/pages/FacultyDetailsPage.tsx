@@ -11,7 +11,6 @@ import { MajorTable } from "../components/MajorTable";
 import {
   AddMajorDialog,
   EditMajorDialog,
-  // DeleteMajorDialog,
 } from "../components/MajorDialogs";
 
 const FacultyDetailsPage = () => {
@@ -20,16 +19,14 @@ const FacultyDetailsPage = () => {
     facultyId: string;
   }>();
   const navigate = useNavigate();
-  const { isSuperAdmin } = useUserRole();
+  const { isAdmin } = useUserRole();
   const universityIdNum = parseInt(universityId || "0");
   const facultyIdNum = parseInt(facultyId || "0");
 
   // Dialog states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingMajor, setEditingMajor] = useState<Major | null>(null);
-  // const [deletingMajor, setDeletingMajor] = useState<Major | null>(null);
 
   // Use custom hook for data management
   const {
@@ -46,7 +43,6 @@ const FacultyDetailsPage = () => {
     handleClearSearch,
     handleAddMajor,
     handleEditMajor,
-    // handleDeleteMajor,
   } = useFacultyDetails({ facultyId: facultyIdNum });
 
   // Navigation handlers
@@ -66,11 +62,6 @@ const FacultyDetailsPage = () => {
     setIsEditDialogOpen(true);
   };
 
-  // const handleDeleteClick = (major: Major) => {
-  //   setDeletingMajor(major);
-  //   setIsDeleteDialogOpen(true);
-  // };
-
   return (
     <div className="space-y-6">
       {/* Back Button */}
@@ -81,7 +72,7 @@ const FacultyDetailsPage = () => {
         </Button>
       </div>
 
-      {isSuperAdmin && (
+      {isAdmin && (
         <div className="flex justify-end">
           <Button onClick={() => setIsAddDialogOpen(true)} size="lg">
             <PlusIcon className="mr-2 size-4" />
@@ -104,9 +95,8 @@ const FacultyDetailsPage = () => {
         facultyName={faculty?.name}
         onMajorClick={handleMajorClick}
         onEditClick={handleEditClick}
-        onDeleteClick={undefined} // Disable delete functionality
         onAddClick={() => setIsAddDialogOpen(true)}
-        showActions={isSuperAdmin}
+        showActions={isAdmin}
       />
 
       {totalPages > 1 && (
@@ -137,15 +127,6 @@ const FacultyDetailsPage = () => {
       />
 
       {/* Delete functionality disabled for now */}
-      {/* <DeleteMajorDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setDeletingMajor(null);
-        }}
-        onDelete={handleDeleteMajor}
-        major={deletingMajor}
-      /> */}
     </div>
   );
 };

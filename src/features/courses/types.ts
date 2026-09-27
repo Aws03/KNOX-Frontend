@@ -10,18 +10,36 @@ export interface Course {
   hasCourseInfo: boolean;
 }
 
-// Backend API response type
+// A course in a major's list: GET /courses/by-major/{majorId} (backend CourseSummaryDto)
 export interface CourseApiResponse {
   id: number;
   courseName: string;
-  description: string;
-  courseCode: string;
-  credits: number;
+  description?: string;
+  courseCode?: string;
+  credits?: number;
   requirementType: string;
   requirementNature: string;
   numberOfMaterials: number;
   numberOfQuizzes: number;
   hasCourseInfo: boolean;
+}
+
+// One course: GET /courses/{id} and /courses/by-code/{code} (backend CourseDto)
+export interface CourseDetails {
+  id: number;
+  courseName: string;
+  description?: string;
+  courseCode?: string;
+  credits?: number;
+  numberOfMaterials: number;
+  numberOfQuizzes: number;
+  courseRequirementMappings: {
+    id: number;
+    courseId: number;
+    majorId: number;
+    requirementType: string;
+    requirementNature: string;
+  }[];
 }
 
 // Resource type enum values
@@ -129,3 +147,32 @@ export const createInitialPaginatedState = <T>(): PaginatedState<T> => ({
   loading: false,
   parentId: null,
 });
+
+// Body of POST/PUT /courses/{courseId}/info
+export interface CourseInfoRequest {
+  difficultyLevel: DifficultyLevel;
+  description: string;
+  demonstrationVideoUrl: string;
+  demonstrationVideoTitle: string;
+}
+
+// Body of POST /courses/{courseId}/resources and PUT /courses/{courseId}/resources/{id}
+export interface CourseResourceRequest {
+  title: string;
+  type: ResourceType;
+  url: string;
+  description: string;
+  hasDemonstrationVideo: boolean;
+  demonstrationVideoUrl: string;
+}
+
+// Body of POST /courses (creates the course in a major)
+export interface CreateCourseRequest {
+  majorId: number;
+  courseName: string;
+  courseCode: string;
+  description: string;
+  credits: number;
+  requirementType: number;
+  requirementNature: number;
+}

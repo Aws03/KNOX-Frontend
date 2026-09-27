@@ -8,7 +8,8 @@ interface FolderCardProps {
   folder: FolderItem;
   courseId: string;
   isManagementMode: boolean;
-  onEdit: (folder: FolderItem) => void;
+  /** Omit to hide the edit button (renaming folders has no API yet). */
+  onEdit?: (folder: FolderItem) => void;
   onDelete: (folderId: number) => void;
 }
 
@@ -59,16 +60,18 @@ export function FolderCard({
 
         {isManagementMode && (
           <>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(folder);
-              }}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(folder);
+                }}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"

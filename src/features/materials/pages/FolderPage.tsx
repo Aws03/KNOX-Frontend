@@ -31,8 +31,6 @@ export default function FolderPage({ mode = "public" }: FolderPageProps) {
     refetch,
     handleDeleteFolder,
     handleDeleteMaterial,
-    handleEditFolder,
-    handleEditMaterial,
   } = useFolderContents({ courseId, folderId, isManagementMode });
 
   const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
@@ -68,14 +66,12 @@ export default function FolderPage({ mode = "public" }: FolderPageProps) {
           folders={contents.folders}
           courseId={courseId!}
           isManagementMode={isManagementMode}
-          onEdit={handleEditFolder}
           onDelete={handleDeleteFolder}
         />
 
         <MaterialsList
           materials={contents.materials}
           isManagementMode={isManagementMode}
-          onEdit={handleEditMaterial}
           onDelete={handleDeleteMaterial}
         />
 

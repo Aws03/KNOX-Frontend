@@ -53,13 +53,7 @@ const QuizzesPage = ({ mode = "public" }: QuizzesPageProps) => {
     navigate(`/courses/${courseId}/quizzes/add`);
   };
 
-  const handleEditQuiz = (_quizId: number) => {
-    // TODO: Implement edit functionality
-  };
 
-  const handleDeleteQuiz = (_quizId: number) => {
-    // TODO: Implement delete functionality
-  };
 
   return (
     <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
@@ -106,8 +100,6 @@ const QuizzesPage = ({ mode = "public" }: QuizzesPageProps) => {
                   courseId={courseId!}
                   isManagementMode={isManagementMode}
                   onQuizClick={handleQuizClick}
-                  onEdit={handleEditQuiz}
-                  onDelete={handleDeleteQuiz}
                 />
               ))}
             </div>
@@ -126,8 +118,6 @@ const QuizzesPage = ({ mode = "public" }: QuizzesPageProps) => {
                   courseId={courseId!}
                   isManagementMode={isManagementMode}
                   onQuizClick={handleQuizClick}
-                  onEdit={handleEditQuiz}
-                  onDelete={handleDeleteQuiz}
                 />
               ))}
             </div>

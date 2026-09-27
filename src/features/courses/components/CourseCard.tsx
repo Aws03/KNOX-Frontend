@@ -14,9 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
-import { apiClient } from "@/lib/api/apiClient";
 import { useAuth } from "@/app/providers/useAuth";
 import type { Course } from "../types";
+import { enrollInCourse } from "@/features/courses/api";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 type CourseCardProps = {
   course: Course;
@@ -45,7 +46,7 @@ export default function CourseCard({
   const handleEnroll = async () => {
     setIsEnrolling(true);
     try {
-      await apiClient.post(`/courses/${course.id}/enroll`, { notes: null });
+      await enrollInCourse(course.id);
       setIsEnrollDialogOpen(false);
       toast.success("Successfully enrolled in the course!", {
         description: "You can now access this course from your profile.",
@@ -53,7 +54,7 @@ export default function CourseCard({
     } catch (error) {
       console.error("Enrollment failed:", error);
       toast.error("Failed to enroll", {
-        description: "Maybe you are already enrolled.",
+        description: getApiErrorMessage(error, "Please try again."),
       });
     } finally {
       setIsEnrolling(false);

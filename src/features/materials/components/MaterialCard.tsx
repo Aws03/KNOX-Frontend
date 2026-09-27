@@ -7,7 +7,8 @@ import { getFileExtension, openFile, downloadFile, formatFileSize, isVideo } fro
 interface MaterialCardProps {
   material: MaterialItem;
   isManagementMode: boolean;
-  onEdit: (material: MaterialItem) => void;
+  /** Omit to hide the edit button (editing materials has no API yet). */
+  onEdit?: (material: MaterialItem) => void;
   onDelete: (materialId: number) => void;
   onPlay: (material: MaterialItem) => void;
 }
@@ -88,16 +89,18 @@ export function MaterialCard({
             >
               Open
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(material);
-              }}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(material);
+                }}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
