@@ -1,75 +1,30 @@
-# React + TypeScript + Vite
+# KNOX web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The React SPA for KNOX, a university knowledge hub. The API lives in [Aws03/KNOX](https://github.com/Aws03/KNOX), which also holds the production deployment (`deploy/`).
 
-Currently, two official plugins are available:
+**Stack:** React 19, TypeScript, Vite 7, React Router 7, TanStack Query, Axios, Tailwind v4 + shadcn/ui, react-i18next (English and Arabic).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Development
 
-## React Compiler
-
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm ci
+npm run dev        # http://localhost:5173, calls the API at http://localhost:5001/api
+npm run lint
+npm test           # Vitest
+npm run build      # type-check + production bundle in dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Set `VITE_API_URL` to point at another API. It is inlined at build time, and the Docker image defaults to `/api`, which nginx proxies.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Production image
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+`Dockerfile` builds the bundle and serves it from unprivileged nginx on port 8080 (`nginx.conf`, rendered from a template at start-up):
+
+- Routes are code-split per page. Hashed `/assets` are cached for a year as immutable; the HTML shell is always revalidated.
+- `/api/*` is proxied to `backend:5001`. The real client IP is taken from the edge proxy (Caddy) and passed on as a single trusted `X-Forwarded-For` hop.
+- `/healthz` proxies the API's readiness check, for uptime monitoring.
+- Security headers include a strict Content-Security-Policy. Set `CSP_MEDIA_SOURCES` to the origins of your CDN and buckets (default `https:`).
+
+Course materials, including large videos, are uploaded straight from the browser to object storage with a presigned URL, and played from short-lived signed URLs. The API only signs requests.
+
+CI (`.github/workflows/ci.yml`) runs audit, lint, tests and build, scans the image with Trivy, and publishes `ghcr.io/<owner>/knox-web` (`sha-<commit>`, `latest`, semver tags) for `linux/amd64` and `linux/arm64`.
