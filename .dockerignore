@@ -5,3 +5,5 @@ dist-ssr
 .gitignore
 *.md
 .vscode
+.github
+coverage
