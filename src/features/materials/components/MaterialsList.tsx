@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Card } from "@/shared/ui/card";
 import { MaterialCard } from "./MaterialCard";
 import type { MaterialItem } from "../types";
+import { VideoPlayerDialog } from "./VideoPlayerDialog";
 
 interface MaterialsListProps {
   materials: MaterialItem[];
@@ -15,6 +17,8 @@ export function MaterialsList({
   onEdit,
   onDelete,
 }: MaterialsListProps) {
+  const [playing, setPlaying] = useState<MaterialItem | null>(null);
+
   if (materials.length === 0) return null;
 
   return (
@@ -28,9 +32,11 @@ export function MaterialsList({
             isManagementMode={isManagementMode}
             onEdit={onEdit}
             onDelete={onDelete}
+            onPlay={setPlaying}
           />
         ))}
       </div>
+      <VideoPlayerDialog material={playing} onClose={() => setPlaying(null)} />
     </Card>
   );
 }

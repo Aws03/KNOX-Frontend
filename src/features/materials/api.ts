@@ -1,3 +1,4 @@
+import axios from "axios";
 import { apiClient } from "@/lib/api/apiClient";
 import type {
   FolderContentsResponse,
@@ -73,20 +74,39 @@ export async function createFolder(
   return response.data;
 }
 
-/**
- * Upload a material file to permanent storage, returning its content URL
- */
-export async function uploadMaterialFile(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("fileCategory", "material");
+type MaterialUploadTicket = {
+  key: string;
+  url: string;
+  method: string;
+  headers: Record<string, string>;
+  expiresAt: string;
+};
 
-  const response = await apiClient.post<{ fileUrl: string }>(
-    "/files/upload/permanent",
-    formData,
-    { headers: { "Content-Type": "multipart/form-data" } }
+/**
+ * Upload a material file straight to object storage and return its upload key.
+ * The API only signs the upload; the bytes (large videos included) never pass through it.
+ */
+export async function uploadMaterialFile(
+  file: File,
+  onProgress?: (percent: number) => void
+): Promise<string> {
+  const { data: ticket } = await apiClient.post<MaterialUploadTicket>(
+    "/files/material-uploads",
+    { fileName: file.name, size: file.size }
   );
-  return response.data.fileUrl;
+
+  // Plain axios: the signed URL is the only credential storage needs (no API token, no base URL).
+  await axios.request({
+    method: ticket.method,
+    url: ticket.url,
+    data: file,
+    headers: ticket.headers,
+    onUploadProgress: (event) => {
+      if (event.total) onProgress?.(Math.round((event.loaded * 100) / event.total));
+    },
+  });
+
+  return ticket.key;
 }
 
 /**
@@ -96,14 +116,14 @@ export async function createMaterial(
   courseId: string,
   data: {
     title: string;
-    contentUrl: string;
+    uploadKey: string;
     folderId?: number;
     description?: string;
   }
 ): Promise<MaterialItem> {
   const response = await apiClient.post<MaterialItem>(`/courses/${courseId}/materials`, {
     title: data.title,
-    contentUrl: data.contentUrl,
+    uploadKey: data.uploadKey,
     folderId: data.folderId ?? null,
     description: data.description || null,
   });

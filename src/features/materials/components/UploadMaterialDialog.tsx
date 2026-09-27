@@ -4,6 +4,8 @@ import { Label } from "@/shared/ui/label";
 import { Textarea } from "@/shared/ui/textarea";
 import { EntityDialog } from "@/shared/components/crud";
 import { createMaterial, uploadMaterialFile } from "../api";
+import { Progress } from "@/shared/ui/progress";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 interface UploadMaterialDialogProps {
   isOpen: boolean;
@@ -24,12 +26,14 @@ export function UploadMaterialDialog({
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const reset = () => {
     setTitle("");
     setDescription("");
     setFile(null);
+    setProgress(null);
     setError(null);
   };
 
@@ -39,10 +43,11 @@ export function UploadMaterialDialog({
     setIsSubmitting(true);
     setError(null);
     try {
-      const contentUrl = await uploadMaterialFile(file);
+      setProgress(0);
+      const uploadKey = await uploadMaterialFile(file, setProgress);
       await createMaterial(courseId, {
         title: title.trim(),
-        contentUrl,
+        uploadKey,
         folderId,
         description: description.trim() || undefined,
       });
@@ -51,9 +56,10 @@ export function UploadMaterialDialog({
       onCreated();
     } catch (err) {
       console.error("Failed to upload material:", err);
-      setError("Failed to upload material. Please try again.");
+      setError(getApiErrorMessage(err, "Failed to upload material. Please try again."));
     } finally {
       setIsSubmitting(false);
+      setProgress(null);
     }
   };
 
@@ -89,7 +95,7 @@ export function UploadMaterialDialog({
           <Input
             id="material-file"
             type="file"
-            accept=".pdf,.jpg,.jpeg,.png,.docx,.pptx,.mp4"
+            accept=".pdf,.jpg,.jpeg,.png,.docx,.pptx,.mp4,.webm"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
         </div>
@@ -102,6 +108,14 @@ export function UploadMaterialDialog({
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
+        {progress !== null && (
+          <div className="grid gap-1">
+            <Progress value={progress} />
+            <p className="text-xs text-muted-foreground">
+              {progress < 100 ? `Uploading… ${progress}%` : "Processing…"}
+            </p>
+          </div>
+        )}
         {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
     </EntityDialog>

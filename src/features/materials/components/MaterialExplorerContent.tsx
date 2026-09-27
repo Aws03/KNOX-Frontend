@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Separator } from "@/shared/ui/separator";
 import { Badge } from "@/shared/ui/badge";
 import { FolderOpen, File as FileIcon } from "lucide-react";
 import { FolderCard } from "./FolderCard";
 import { MaterialCard } from "./MaterialCard";
 import type { FolderItem, MaterialItem } from "../types";
+import { VideoPlayerDialog } from "./VideoPlayerDialog";
 
 interface MaterialExplorerContentProps {
   folders: FolderItem[];
@@ -26,6 +28,7 @@ export function MaterialExplorerContent({
   onEditMaterial = () => {},
   onDeleteMaterial = () => {},
 }: MaterialExplorerContentProps) {
+  const [playing, setPlaying] = useState<MaterialItem | null>(null);
   const hasFolders = folders.length > 0;
   const hasMaterials = materials.length > 0;
   const isEmpty = !hasFolders && !hasMaterials;
@@ -87,12 +90,14 @@ export function MaterialExplorerContent({
                   isManagementMode={isManagementMode}
                   onEdit={onEditMaterial}
                   onDelete={onDeleteMaterial}
+                  onPlay={setPlaying}
                 />
               ))}
             </div>
           </div>
         </>
       )}
+      <VideoPlayerDialog material={playing} onClose={() => setPlaying(null)} />
     </>
   );
 }
