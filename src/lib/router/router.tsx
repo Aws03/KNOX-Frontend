@@ -1,32 +1,35 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import App from "../../app/App";
-import HomePage from "../../features/home/pages/HomePage";
-import AboutPage from "../../features/home/pages/AboutPage";
-import NotFoundPage from "@/features/home/pages/NotFoundPage";
-import LoginPage from "@/features/auth/pages/LoginPage";
-import RegisterPage from "@/features/auth/pages/RegisterPage";
-import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
-import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
 import AuthLayout from "@/shared/layout/AuthLayout";
-import CoursesPage from "@/features/courses/pages/CoursesPage";
-import CourseInfoPage from "@/features/courses/pages/CourseInfoPage";
-import FolderPage from "@/features/materials/pages/FolderPage";
-import QuizzesPage from "@/features/quizzes/pages/QuizzesPage";
-import QuizQuestionsPage from "@/features/quizzes/pages/QuizQuestionPage";
-import AddQuizPage from "@/features/quizzes/pages/AddQuizPage";
-import ProfilePage from "@/features/profile/pages/ProfilePage";
-import EditProfilePage from "@/features/profile/pages/EditProfilePage";
 import { ProtectedRoute } from "@/lib/router/ProtectedRoute";
 import DashboardLayout from "@/shared/layout/DashboardLayout";
-import AnalyticsPage from "@/features/dashboard/pages/AnalyticsPage";
-import ManageUniversitiesPage from "@/features/universities/pages/ManageUniversitiesPage";
-import UniversityDetailsPage from "@/features/universities/pages/UniversityDetailsPage";
-import FacultyDetailsPage from "@/features/universities/pages/FacultyDetailsPage";
-import ManageUsersPage from "@/features/users/pages/ManageUsersPage";
-import WriterStatisticsPage from "@/features/dashboard/pages/WriterStatisticsPage";
-import MajorCoursesPage from "@/features/courses/pages/MajorCoursesPage";
-import MaterialExplorerPage from "@/features/materials/pages/MaterialExplorerPage";
-import ManageResourcesPage from "@/features/courses/pages/ManageResourcesPage";
+
+// Pages load on demand: each route is its own chunk, so the first visit downloads only what it shows.
+const HomePage = lazy(() => import("../../features/home/pages/HomePage"));
+const AboutPage = lazy(() => import("../../features/home/pages/AboutPage"));
+const NotFoundPage = lazy(() => import("@/features/home/pages/NotFoundPage"));
+const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
+const RegisterPage = lazy(() => import("@/features/auth/pages/RegisterPage"));
+const ForgotPasswordPage = lazy(() => import("@/features/auth/pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("@/features/auth/pages/ResetPasswordPage"));
+const CoursesPage = lazy(() => import("@/features/courses/pages/CoursesPage"));
+const CourseInfoPage = lazy(() => import("@/features/courses/pages/CourseInfoPage"));
+const FolderPage = lazy(() => import("@/features/materials/pages/FolderPage"));
+const QuizzesPage = lazy(() => import("@/features/quizzes/pages/QuizzesPage"));
+const QuizQuestionsPage = lazy(() => import("@/features/quizzes/pages/QuizQuestionPage"));
+const AddQuizPage = lazy(() => import("@/features/quizzes/pages/AddQuizPage"));
+const ProfilePage = lazy(() => import("@/features/profile/pages/ProfilePage"));
+const EditProfilePage = lazy(() => import("@/features/profile/pages/EditProfilePage"));
+const AnalyticsPage = lazy(() => import("@/features/dashboard/pages/AnalyticsPage"));
+const ManageUniversitiesPage = lazy(() => import("@/features/universities/pages/ManageUniversitiesPage"));
+const UniversityDetailsPage = lazy(() => import("@/features/universities/pages/UniversityDetailsPage"));
+const FacultyDetailsPage = lazy(() => import("@/features/universities/pages/FacultyDetailsPage"));
+const ManageUsersPage = lazy(() => import("@/features/users/pages/ManageUsersPage"));
+const WriterStatisticsPage = lazy(() => import("@/features/dashboard/pages/WriterStatisticsPage"));
+const MajorCoursesPage = lazy(() => import("@/features/courses/pages/MajorCoursesPage"));
+const MaterialExplorerPage = lazy(() => import("@/features/materials/pages/MaterialExplorerPage"));
+const ManageResourcesPage = lazy(() => import("@/features/courses/pages/ManageResourcesPage"));
 
 export const router = createBrowserRouter([
   {
