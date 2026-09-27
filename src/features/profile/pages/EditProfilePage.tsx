@@ -7,7 +7,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { ArrowLeft, Camera, Save, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
-import { getInitials } from "../utils/profileUtils";
+import { getInitials } from "@/lib/utils";
 import { ImageCropper } from "../components/ImageCropper";
 import { ProfilePictureMenu } from "../components/ProfilePictureMenu";
 import { ImageViewerDialog } from "../components/ImageViewerDialog";

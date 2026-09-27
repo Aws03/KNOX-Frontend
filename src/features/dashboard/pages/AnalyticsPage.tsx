@@ -22,7 +22,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { cn } from "@/lib/utils";
 
 // Custom analytics components
-import GrowthMetricsChart from "@/features/dashboard/componenets/GrowthMetricsChart";
+import GrowthMetricsChart from "@/features/dashboard/components/GrowthMetricsChart";
 
 // Analytics data structure
 import type { AnalyticsData } from "../types";
@@ -359,10 +359,6 @@ const AnalyticsPage = () => {
               </Badge>
             </div>
           </div>
-          {/* <p className="text-muted-foreground max-w-2xl">
-            Comprehensive insights into Uni-Hub's growth, engagement, and
-            platform performance metrics.
-          </p> */}
         </div>
       </div>
 

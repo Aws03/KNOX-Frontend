@@ -23,7 +23,7 @@ import {
   TooltipProvider,
 } from "@/shared/ui/tooltip";
 
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 import Logo from "@/assets/logo";
 import { ModeToggle } from "../../ui/modetoggle";
@@ -43,15 +43,6 @@ type HeaderProps = {
 const Header = ({ navigationData, className }: HeaderProps) => {
   const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   const displayName = user?.fullName || user?.name || "User";
 

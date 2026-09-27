@@ -17,7 +17,6 @@ interface UniversityTableProps {
   searchTerm: string;
   onManageClick: (universityId: number) => void;
   onEditClick: (university: University) => void;
-  // onDeleteClick: (university: University) => void;
 }
 
 const UniversityTableSkeleton = () => (
@@ -48,8 +47,7 @@ export const UniversityTable = ({
   searchTerm,
   onManageClick,
   onEditClick,
-}: // onDeleteClick,
-UniversityTableProps) => {
+}: UniversityTableProps) => {
   if (loading) {
     return <UniversityTableSkeleton />;
   }
@@ -100,15 +98,6 @@ UniversityTableProps) => {
                     <Pencil className="mr-2 size-4" />
                     Edit
                   </Button>
-                  {/* <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive hover:bg-destructive/10"
-                    onClick={() => onDeleteClick(university)}
-                  >
-                    <Trash2 className="mr-2 size-4" />
-                    Delete
-                  </Button> */}
                 </div>
               </TableCell>
             </TableRow>

@@ -88,16 +88,6 @@ export const useUniversities = (): UseUniversitiesResult => {
     }
   };
 
-  // const handleDeleteUniversity = async (id: number) => {
-  //   try {
-  //     await deleteUniversity(id);
-  //     await loadUniversities(currentPage, searchTerm);
-  //   } catch (error) {
-  //     console.error("Failed to delete university:", error);
-  //     throw error;
-  //   }
-  // };
-
   const refreshUniversities = async () => {
     await loadUniversities(currentPage, searchTerm);
   };
@@ -113,7 +103,6 @@ export const useUniversities = (): UseUniversitiesResult => {
     paginationInfo,
     handleAddUniversity,
     handleEditUniversity,
-    // handleDeleteUniversity,
     refreshUniversities,
   };
 };

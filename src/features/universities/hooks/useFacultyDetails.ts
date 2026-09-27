@@ -100,17 +100,6 @@ export const useFacultyDetails = ({
     }
   };
 
-  // Handle delete major
-  // const handleDeleteMajor = async (majorId: number) => {
-  //   try {
-  //     await deleteMajor(majorId);
-  //     loadMajors(currentPage, searchTerm);
-  //   } catch (error) {
-  //     console.error("Failed to delete major:", error);
-  //     throw error;
-  //   }
-  // };
-
   useEffect(() => {
     loadFaculty();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,6 +124,5 @@ export const useFacultyDetails = ({
     handleClearSearch,
     handleAddMajor,
     handleEditMajor,
-    // handleDeleteMajor,
   };
 };

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import { EntityDialog, DeleteConfirmDialog } from "@/shared/components/crud";
+import { EntityDialog } from "@/shared/components/crud";
 import type { University } from "../types";
 
 interface AddUniversityDialogProps {
@@ -109,40 +109,5 @@ export const EditUniversityDialog = ({
         />
       </div>
     </EntityDialog>
-  );
-};
-
-interface DeleteUniversityDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onDelete: (id: number) => Promise<void>;
-  university: University | null;
-}
-
-export const DeleteUniversityDialog = ({
-  isOpen,
-  onClose,
-  onDelete,
-  university,
-}: DeleteUniversityDialogProps) => {
-  const handleConfirm = async () => {
-    if (!university) return;
-    try {
-      await onDelete(university.id);
-      onClose();
-    } catch {
-      // Error is handled in the hook
-    }
-  };
-
-  return (
-    <DeleteConfirmDialog
-      open={isOpen}
-      onOpenChange={onClose}
-      onConfirm={handleConfirm}
-      title="Confirm Deletion"
-      description={`Are you sure you want to inactivate "${university?.name}"? This action will soft delete the university from the system.`}
-      entityName="university"
-    />
   );
 };

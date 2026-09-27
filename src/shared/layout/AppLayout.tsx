@@ -36,18 +36,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       title: "About Us",
       href: "/about",
     },
-    // {
-    //   title: "Materials",
-    //   href: "/materials",
-    // },
     {
       title: "Courses",
       href: "/courses",
     },
-    // {
-    //   title: "Supervisor",
-    //   href: "/supervisor",
-    // },
     ...(canAccessDashboard
       ? [
           {

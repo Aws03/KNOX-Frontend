@@ -8,12 +8,12 @@ import ar from "../../i18n/locales/ar.json";
 const getInitialLanguage = () => {
   try {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("preferred-language") ?? "ar";
+      return localStorage.getItem("preferred-language") ?? "en";
     }
   } catch {
     // ignore localStorage errors
   }
-  return "ar";
+  return "en";
 };
 
 i18n.use(initReactI18next).init({
@@ -22,7 +22,7 @@ i18n.use(initReactI18next).init({
     ar: { translation: ar },
   },
   lng: getInitialLanguage(),
-  fallbackLng: "ar",
+  fallbackLng: "en",
 });
 
 export const I18nProvider = ({ children }: { children: React.ReactNode }) => {

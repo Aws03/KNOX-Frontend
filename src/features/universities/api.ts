@@ -63,13 +63,6 @@ export const updateUniversity = async (
   return response.data;
 };
 
-// /**
-//  * Delete (inactivate) a university
-//  */
-// export const deleteUniversity = async (id: number): Promise<void> => {
-//   await apiClient.delete(`/universities/${id}`);
-// };
-
 // ==================== Faculties API ====================
 
 /**
@@ -122,9 +115,6 @@ export const updateFaculty = async (
 /**
  * Delete (inactivate) a faculty
  */
-// export const deleteFaculty = async (id: number): Promise<void> => {
-//   await apiClient.delete(`/faculties/${id}`);
-// };
 
 // ==================== Majors API ====================
 
@@ -168,6 +158,3 @@ export const updateMajor = async (
 /**
  * Delete (inactivate) a major
  */
-// export const deleteMajor = async (id: number): Promise<void> => {
-//   await apiClient.delete(`/majors/${id}`);
-// };

@@ -26,7 +26,6 @@ interface UseUniversityDetailsResult {
   handleClearSearch: () => void;
   handleAddFaculty: (name: string) => Promise<void>;
   handleEditFaculty: (id: number, name: string) => Promise<void>;
-  // handleDeleteFaculty: (id: number) => Promise<void>;
 }
 
 export const useUniversityDetails = ({
@@ -120,16 +119,6 @@ export const useUniversityDetails = ({
     }
   };
 
-  // const handleDeleteFaculty = async (id: number) => {
-  //   try {
-  //     await deleteFaculty(id);
-  //     await loadFaculties(currentPage, searchTerm);
-  //   } catch (error) {
-  //     console.error("Failed to delete faculty:", error);
-  //     throw error;
-  //   }
-  // };
-
   return {
     university,
     faculties,
@@ -144,6 +133,5 @@ export const useUniversityDetails = ({
     handleClearSearch,
     handleAddFaculty,
     handleEditFaculty,
-    // handleDeleteFaculty,
   };
 };

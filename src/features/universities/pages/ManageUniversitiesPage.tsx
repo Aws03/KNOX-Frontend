@@ -8,7 +8,6 @@ import { UniversityTable } from "../components/UniversityTable";
 import {
   AddUniversityDialog,
   EditUniversityDialog,
-  // DeleteUniversityDialog,
 } from "../components/UniversityDialogs";
 
 const ManageUniversitiesPage = () => {
@@ -17,12 +16,9 @@ const ManageUniversitiesPage = () => {
   // Dialog states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingUniversity, setEditingUniversity] = useState<University | null>(
     null
   );
-  // const [deletingUniversity, setDeletingUniversity] =
-  //   useState<University | null>(null);
 
   // Use custom hook for data management
   const {
@@ -36,7 +32,6 @@ const ManageUniversitiesPage = () => {
     paginationInfo,
     handleAddUniversity,
     handleEditUniversity,
-    // handleDeleteUniversity,
   } = useUniversities();
 
   // Navigation handlers
@@ -49,11 +44,6 @@ const ManageUniversitiesPage = () => {
     setEditingUniversity(university);
     setIsEditDialogOpen(true);
   };
-
-  // const handleDeleteClick = (university: University) => {
-  //   setDeletingUniversity(university);
-  //   setIsDeleteDialogOpen(true);
-  // };
 
   return (
     <>
@@ -72,7 +62,6 @@ const ManageUniversitiesPage = () => {
           searchTerm={searchTerm}
           onManageClick={handleManageClick}
           onEditClick={handleEditClick}
-          // onDeleteClick={handleDeleteClick}
         />
 
         {totalPages > 1 && (
@@ -104,15 +93,6 @@ const ManageUniversitiesPage = () => {
         university={editingUniversity}
       />
 
-      {/* <DeleteUniversityDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setDeletingUniversity(null);
-        }}
-        onDelete={handleDeleteUniversity}
-        university={deletingUniversity}
-      /> */}
     </>
   );
 };

@@ -1,7 +1,6 @@
 import {
   GraduationCap,
   Pencil,
-  Trash2,
   PlusIcon,
   ArrowRight,
   FolderTree,
@@ -32,7 +31,6 @@ interface MajorTableProps {
   facultyName?: string;
   onMajorClick: (majorId: number) => void;
   onEditClick: (major: Major) => void;
-  onDeleteClick?: (major: Major) => void;
   onAddClick: () => void;
   showActions?: boolean;
 }
@@ -44,7 +42,6 @@ export const MajorTable = ({
   facultyName,
   onMajorClick,
   onEditClick,
-  onDeleteClick,
   onAddClick,
   showActions = true,
 }: MajorTableProps) => {
@@ -148,17 +145,6 @@ export const MajorTable = ({
                           <Pencil className="mr-2 size-4" />
                           Edit
                         </Button>
-                        {onDeleteClick && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:bg-destructive/10"
-                            onClick={() => onDeleteClick(major)}
-                          >
-                            <Trash2 className="mr-2 size-4" />
-                            Delete
-                          </Button>
-                        )}
                       </div>
                     ) : (
                       <Button

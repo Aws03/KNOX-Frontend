@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import type { CourseFilterValues, University, Faculty, Major } from "../types";
 
-const FILTER_STORAGE_KEY = "course_filter_state";
+export const FILTER_STORAGE_KEY = "course_filter_state";
 
 interface StoredFilterState {
   university: University | null;

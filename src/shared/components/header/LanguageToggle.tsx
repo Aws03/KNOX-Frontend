@@ -10,11 +10,8 @@ import {
 import { Globe, Check } from "lucide-react";
 
 const LanguageToggle = () => {
-  const [language, setLanguage] = useState(() =>
-    typeof window !== "undefined"
-      ? localStorage.getItem("preferred-language") ?? "en"
-      : "en"
-  );
+  // Start from the language I18nProvider initialised (the stored preference, default "en").
+  const [language, setLanguage] = useState(() => i18n.language || "en");
 
   const languages = [
     { code: "en", name: "English", nativeName: "English" },

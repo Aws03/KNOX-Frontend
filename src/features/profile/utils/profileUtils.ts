@@ -1,12 +1,3 @@
-export const getInitials = (name: string): string => {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-};
-
 export const getRoleBadgeVariant = (role: string): string => {
   const roleUpper = role.toUpperCase();
   if (roleUpper === "ADMIN" || roleUpper === "SUPERADMIN") {

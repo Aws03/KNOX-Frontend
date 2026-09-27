@@ -25,7 +25,6 @@ interface FacultyTableProps {
   universityName?: string;
   onFacultyClick: (facultyId: number) => void;
   onEditClick: (faculty: Faculty) => void;
-  // onDeleteClick: (faculty: Faculty) => void;
   onAddClick: () => void;
 }
 
@@ -74,7 +73,6 @@ export const FacultyTable = ({
   universityName,
   onFacultyClick,
   onEditClick,
-  // onDeleteClick,
   onAddClick,
 }: FacultyTableProps) => {
   if (loading) {
@@ -135,15 +133,6 @@ export const FacultyTable = ({
                         <Pencil className="mr-2 size-4" />
                         Edit
                       </Button>
-                      {/* <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10"
-                        onClick={() => onDeleteClick(faculty)}
-                      >
-                        <Trash2 className="mr-2 size-4" />
-                        Delete
-                      </Button> */}
                     </div>
                   </TableCell>
                 </TableRow>

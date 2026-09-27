@@ -9,7 +9,6 @@ import { FacultyTable } from "../components/FacultyTable";
 import {
   AddFacultyDialog,
   EditFacultyDialog,
-  // DeleteFacultyDialog,
 } from "../components/FacultyDialogs";
 
 const UniversityDetailsPage = () => {
@@ -20,9 +19,7 @@ const UniversityDetailsPage = () => {
   // Dialog states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
-  // const [deletingFaculty, setDeletingFaculty] = useState<Faculty | null>(null);
 
   // Use custom hook for data management
   const {
@@ -39,7 +36,6 @@ const UniversityDetailsPage = () => {
     handleClearSearch,
     handleAddFaculty,
     handleEditFaculty,
-    // handleDeleteFaculty,
   } = useUniversityDetails({ universityId });
 
   // Navigation handlers
@@ -56,11 +52,6 @@ const UniversityDetailsPage = () => {
     setEditingFaculty(faculty);
     setIsEditDialogOpen(true);
   };
-
-  // const handleDeleteClick = (faculty: Faculty) => {
-  //   setDeletingFaculty(faculty);
-  //   setIsDeleteDialogOpen(true);
-  // };
 
   return (
     <div className="space-y-6">
@@ -84,7 +75,6 @@ const UniversityDetailsPage = () => {
         universityName={university?.name}
         onFacultyClick={handleFacultyClick}
         onEditClick={handleEditClick}
-        // onDeleteClick={handleDeleteClick}
         onAddClick={() => setIsAddDialogOpen(true)}
       />
 
@@ -115,15 +105,6 @@ const UniversityDetailsPage = () => {
         faculty={editingFaculty}
       />
 
-      {/* <DeleteFacultyDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setDeletingFaculty(null);
-        }}
-        onDelete={handleDeleteFaculty}
-        faculty={deletingFaculty}
-      /> */}
     </div>
   );
 };

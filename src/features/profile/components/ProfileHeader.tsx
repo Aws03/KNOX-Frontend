@@ -14,7 +14,8 @@ import {
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { User } from "@/app/providers/AuthContext";
-import { getInitials, getRoleBadgeVariant } from "../utils/profileUtils";
+import { getRoleBadgeVariant } from "../utils/profileUtils";
+import { getInitials } from "@/lib/utils";
 import { ProfilePictureMenu } from "./ProfilePictureMenu";
 import { ImageViewerDialog } from "./ImageViewerDialog";
 

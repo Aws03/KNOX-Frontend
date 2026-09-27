@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { useAuth } from "@/app/providers/useAuth";
+import { getInitials } from "@/lib/utils";
 
 type Props = {
   trigger: ReactNode;
@@ -30,16 +31,6 @@ type Props = {
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
   const { user } = useAuth();
-
-  // Generate initials from user name
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   const displayName = user?.fullName || user?.name || "User";
   const displayEmail = user?.email || "";
