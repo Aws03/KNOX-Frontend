@@ -17,6 +17,7 @@ import type {
   Major,
   CourseInfo,
 } from "./types";
+import { REQUIREMENT_NATURE_MAP, REQUIREMENT_TYPE_MAP } from "./types";
 
 // Helper function to map API response to Course UI type.
 // majorName comes from the caller's own selection/context (the by-major
@@ -58,27 +59,14 @@ export const fetchCoursesByMajor = async (
 
   // Map filter values to API parameters
   if (filters?.requirement) {
-    const requirementNatureMap: Record<string, string> = {
-      Obligatory: "1",
-      Optional: "2",
-      "Prerequisite Required": "3",
-      "No Prerequisites": "4",
-    };
     const mappedValue =
-      requirementNatureMap[filters.requirement] || filters.requirement;
+      REQUIREMENT_NATURE_MAP[filters.requirement] || filters.requirement;
     extraParams.push(`requirementNature=${encodeURIComponent(mappedValue)}`);
   }
 
   if (filters?.courseType) {
-    const requirementTypeMap: Record<string, string> = {
-      Specialist: "1",
-      "Free Course": "2",
-      "Core Course": "3",
-      Elective: "4",
-      "Lab Course": "5",
-    };
     const mappedValue =
-      requirementTypeMap[filters.courseType] || filters.courseType;
+      REQUIREMENT_TYPE_MAP[filters.courseType] || filters.courseType;
     extraParams.push(`requirementType=${encodeURIComponent(mappedValue)}`);
   }
 

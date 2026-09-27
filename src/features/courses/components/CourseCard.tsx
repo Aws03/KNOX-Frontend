@@ -118,7 +118,7 @@ export default function CourseCard({
               {course.badges.map((badge, index) => (
                 <Badge
                   key={index}
-                  variant={badge === "Obligatory" ? "default" : "outline"}
+                  variant={badge === "Compulsory" ? "default" : "outline"}
                   className="text-xs py-0 h-5"
                 >
                   {badge}
@@ -290,7 +290,7 @@ export default function CourseCard({
             {course.badges.map((badge, index) => (
               <Badge
                 key={index}
-                variant={badge === "Obligatory" ? "default" : "outline"}
+                variant={badge === "Compulsory" ? "default" : "outline"}
                 className="text-xs py-0 h-5"
               >
                 {badge}

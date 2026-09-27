@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { register } from "@/features/auth/api";
 import { useAuth } from "@/app/providers/useAuth";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 type RegistrationData = {
   fullName: string;
@@ -35,16 +36,7 @@ export const useRegistration = () => {
       }
     } catch (error: unknown) {
       console.error("Registration failed:", error);
-      let errorMessage = "Registration failed. Please try again.";
-
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { data?: { message?: string } };
-        };
-        errorMessage = axiosError.response?.data?.message || errorMessage;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage = getApiErrorMessage(error, "Registration failed. Please try again.");
 
       toast.error("Registration failed", { description: errorMessage });
       throw error;

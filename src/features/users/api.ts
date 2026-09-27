@@ -44,7 +44,7 @@ export const fetchUsers = async (
     }
 
     const response = await apiClient.get<UserResponse>(
-      `/Users/details?${queryParams}`
+      `/users/details?${queryParams}`
     );
     return response.data;
   } catch (error) {
@@ -58,7 +58,7 @@ export const fetchUsers = async (
  */
 export const fetchUserRoles = async (): Promise<UserRole[]> => {
   try {
-    const response = await apiClient.get<UserRole[]>("/Users/roles");
+    const response = await apiClient.get<UserRole[]>("/users/roles");
     return response.data;
   } catch (error) {
     console.error("Failed to fetch roles:", error);
@@ -74,7 +74,7 @@ export const assignRoleToUser = async (
   role: UserRole
 ): Promise<void> => {
   try {
-    await apiClient.post(`/Users/${userId}/assign-role`, role, {
+    await apiClient.post(`/users/${userId}/assign-role`, role, {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
@@ -88,7 +88,7 @@ export const assignRoleToUser = async (
  */
 export const blockUser = async (userId: number): Promise<void> => {
   try {
-    await apiClient.post(`/Users/${userId}/block`);
+    await apiClient.post(`/users/${userId}/block`);
   } catch (error) {
     console.error("Failed to block user:", error);
     throw new Error("Failed to block user. Please try again later.");
@@ -100,7 +100,7 @@ export const blockUser = async (userId: number): Promise<void> => {
  */
 export const activateUser = async (userId: number): Promise<void> => {
   try {
-    await apiClient.post(`/Users/${userId}/activate`);
+    await apiClient.post(`/users/${userId}/activate`);
   } catch (error) {
     console.error("Failed to activate user:", error);
     throw new Error("Failed to activate user. Please try again later.");
@@ -129,7 +129,7 @@ export const fetchWriterStatistics = async (
   writerId: number
 ): Promise<WriterStatistics> => {
   const response = await apiClient.get<WriterStatistics>(
-    `/Users/${writerId}/writer-statistics`
+    `/users/${writerId}/writer-statistics`
   );
   return response.data;
 };

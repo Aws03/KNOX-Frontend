@@ -9,6 +9,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { forgotPassword } from "@/features/auth/api";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -29,16 +30,7 @@ const ForgotPasswordForm = () => {
       navigate(`/auth/reset-password?email=${encodeURIComponent(email)}`);
     } catch (err) {
       console.error("Forgot password error:", err);
-      let errorMessage = "Failed to send reset code. Please try again.";
-
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as {
-          response?: { data?: { message?: string } };
-        };
-        errorMessage = axiosError.response?.data?.message || errorMessage;
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
-      }
+      const errorMessage = getApiErrorMessage(err, "Failed to send reset code. Please try again.");
 
       setError(errorMessage);
       toast.error("Couldn't send reset code", { description: errorMessage });

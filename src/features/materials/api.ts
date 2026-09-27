@@ -103,7 +103,7 @@ export async function createMaterial(
 ): Promise<MaterialItem> {
   const response = await apiClient.post<MaterialItem>(`/courses/${courseId}/materials`, {
     title: data.title,
-    contemtUrl: data.contentUrl,
+    contentUrl: data.contentUrl,
     folderId: data.folderId ?? null,
     description: data.description || null,
   });

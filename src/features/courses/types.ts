@@ -103,38 +103,23 @@ export interface PaginatedState<T> {
   parentId: number | null;
 }
 
-// Requirement mappings
+// Requirement vocabulary: mirrors the backend's RequirementType / RequirementNature enums
+// (label -> numeric value sent to the API; the API returns the label).
 export const REQUIREMENT_TYPE_MAP: Record<string, string> = {
-  Specialist: "1",
-  "Free Course": "2",
-  "Core Course": "3",
-  Elective: "4",
-  "Lab Course": "5",
+  University: "1",
+  Faculty: "2",
+  Major: "3",
+  Remedial: "4",
 };
 
 export const REQUIREMENT_NATURE_MAP: Record<string, string> = {
-  Obligatory: "1",
-  Optional: "2",
-  "Prerequisite Required": "3",
-  "No Prerequisites": "4",
   Compulsory: "1",
+  Elective: "2",
 };
 
 // Available filter options
-export const COURSE_TYPES = [
-  "Specialist",
-  "Free Course",
-  "Core Course",
-  "Elective",
-  "Lab Course",
-];
-
-export const REQUIREMENT_TYPES = [
-  "Obligatory",
-  "Optional",
-  "Prerequisite Required",
-  "No Prerequisites",
-];
+export const COURSE_TYPES = Object.keys(REQUIREMENT_TYPE_MAP);
+export const REQUIREMENT_TYPES = Object.keys(REQUIREMENT_NATURE_MAP);
 
 // Utility function to create initial paginated state
 export const createInitialPaginatedState = <T>(): PaginatedState<T> => ({

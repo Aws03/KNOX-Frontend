@@ -12,7 +12,7 @@ export interface UpdateProfileData {
  */
 export const updateProfile = async (data: UpdateProfileData): Promise<void> => {
   try {
-    await apiClient.put("/Users/me", data);
+    await apiClient.put("/users/me", data);
   } catch (error) {
     console.error("Failed to update profile:", error);
     throw new Error("Failed to update profile. Please try again later.");
@@ -28,8 +28,8 @@ export const uploadProfilePicture = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("image", file);
 
-    const response = await apiClient.post<{ url: string }>(
-      "/Users/me/profile-picture",
+    const response = await apiClient.post<{ profilePictureUrl: string | null }>(
+      "/users/me/profile-picture",
       formData,
       {
         headers: {
@@ -38,7 +38,7 @@ export const uploadProfilePicture = async (file: File): Promise<string> => {
       }
     );
 
-    return response.data.url;
+    return response.data.profilePictureUrl ?? "";
   } catch (error) {
     console.error("Failed to upload profile picture:", error);
     throw new Error(
@@ -52,7 +52,7 @@ export const uploadProfilePicture = async (file: File): Promise<string> => {
  */
 export const deleteProfilePicture = async (): Promise<void> => {
   try {
-    await apiClient.delete("/Users/me/profile-picture");
+    await apiClient.delete("/users/me/profile-picture");
   } catch (error) {
     console.error("Failed to delete profile picture:", error);
     throw new Error(

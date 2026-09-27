@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { changePassword } from "@/features/auth/api";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 const ChangePasswordCard = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -36,16 +37,7 @@ const ChangePasswordCard = () => {
       setConfirmPassword("");
     } catch (err) {
       console.error("Failed to change password:", err);
-      let errorMessage = "Failed to change password. Please try again.";
-
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as {
-          response?: { data?: { message?: string } };
-        };
-        errorMessage = axiosError.response?.data?.message || errorMessage;
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
-      }
+      const errorMessage = getApiErrorMessage(err, "Failed to change password. Please try again.");
 
       setError(errorMessage);
       toast.error("Couldn't change password", { description: errorMessage });

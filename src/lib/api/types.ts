@@ -14,14 +14,3 @@ export interface PaginationParams {
   pageSize?: number;
   [key: string]: string | number | boolean | undefined;
 }
-
-export interface ApiError {
-  message: string;
-  statusCode: number;
-  details?: unknown;
-}
-
-export interface ApiSuccess<T = void> {
-  data: T;
-  message?: string;
-}

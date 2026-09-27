@@ -8,6 +8,7 @@ import type {
   ReactionResult,
 } from "./types";
 import { getStoredToken } from "@/hooks/authStorage";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 /**
  * Upload a temporary file (image) to the server
@@ -42,16 +43,7 @@ export const createQuiz = async (payload: CreateQuizPayload): Promise<void> => {
   try {
     await apiClient.post("/quizzes", payload);
   } catch (err) {
-    console.error("Failed to create quiz:", err);
-    const error = err as {
-      response?: { data?: { message?: string } };
-      message?: string;
-    };
-    throw new Error(
-      error.response?.data?.message ||
-        error.message ||
-        "Failed to create quiz. Please try again."
-    );
+    throw new Error(getApiErrorMessage(err, "Failed to create quiz. Please try again."));
   }
 };
 
@@ -114,11 +106,7 @@ const addReaction = async (
     );
     return response.data;
   } catch (err) {
-    const error = err as {
-      response?: { data?: { errors?: { description?: string }[] } };
-    };
-    const message = error.response?.data?.errors?.[0]?.description;
-    throw new Error(message || "Failed to update your reaction. Please try again.");
+    throw new Error(getApiErrorMessage(err, "Failed to update your reaction. Please try again."));
   }
 };
 
@@ -155,26 +143,6 @@ export const submitQuizScore = async (
   }
 };
 
-/**
- * Get user ID from auth token
- * @returns User ID or default value (1)
- */
-export const getUserIdFromToken = (): number => {
-  try {
-    const authData = getStoredToken();
-    if (!authData) return 1;
-
-    const tokenPayload = JSON.parse(atob(authData.split(".")[1]));
-    return parseInt(
-      tokenPayload[
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-      ] || "1"
-    );
-  } catch (e) {
-    console.error("Failed to parse auth token:", e);
-    return 1;
-  }
-};
 
 /**
  * Check if user is logged in

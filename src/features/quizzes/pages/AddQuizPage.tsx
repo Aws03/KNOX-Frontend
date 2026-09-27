@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/shared/ui/button";
-import { createQuiz, getUserIdFromToken } from "../api";
+import { createQuiz } from "../api";
 import { validateQuiz } from "../utils";
 import { useQuizForm } from "../hooks/useQuizForm";
 import { useImageUpload } from "../hooks/useImageUpload";
@@ -55,16 +55,12 @@ const AddQuizPage = () => {
     setIsSubmitting(true);
 
     try {
-      const writerId = getUserIdFromToken();
-
       const payload = {
         title: title.trim(),
-        writerId,
         courseId: parseInt(courseId!),
         description: description.trim() || null,
         questions: questions.map((q) => ({
           text: q.text.trim(),
-          quizId: 0,
           imageUrl: q.imageUrl,
           type: q.type,
           choices: q.choices.map((c) => ({

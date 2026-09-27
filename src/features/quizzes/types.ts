@@ -93,7 +93,6 @@ export type CreateQuizChoicePayload = {
 
 export type CreateQuizQuestionPayload = {
   text: string;
-  quizId: number;
   imageUrl: string | null;
   type: QuestionTypeValue;
   choices: CreateQuizChoicePayload[];
@@ -101,7 +100,6 @@ export type CreateQuizQuestionPayload = {
 
 export type CreateQuizPayload = {
   title: string;
-  writerId: number;
   courseId: number;
   description: string | null;
   questions: CreateQuizQuestionPayload[];

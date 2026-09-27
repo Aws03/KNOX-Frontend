@@ -10,6 +10,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { resetPassword } from "@/features/auth/api";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams();
@@ -43,16 +44,7 @@ const ResetPasswordForm = () => {
       navigate("/auth/login");
     } catch (err) {
       console.error("Reset password error:", err);
-      let errorMessage = "Failed to reset password. Please try again.";
-
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as {
-          response?: { data?: { message?: string } };
-        };
-        errorMessage = axiosError.response?.data?.message || errorMessage;
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
-      }
+      const errorMessage = getApiErrorMessage(err, "Failed to reset password. Please try again.");
 
       setError(errorMessage);
       toast.error("Couldn't reset password", { description: errorMessage });

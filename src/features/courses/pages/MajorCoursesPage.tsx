@@ -11,6 +11,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { apiClient } from "@/lib/api/apiClient";
 import { fetchCourseByCode } from "@/features/courses/api";
+import type { CourseApiResponse } from "@/features/courses/types";
 import { toast } from "sonner";
 import { useParams, useNavigate } from "react-router-dom";
 import SmartPagination from "@/shared/components/pagination/SmartPagination";
@@ -21,6 +22,7 @@ import { CoursesTable } from "@/features/courses/components/CoursesTable";
 import { useCourseFilters } from "@/features/courses/hooks/useCourseFilters";
 import { useBreadcrumbData } from "@/features/courses/hooks/useBreadcrumbData";
 import { useCourses } from "@/features/courses/hooks/useCourses";
+import { getApiErrorMessage, getApiErrorStatus } from "@/lib/api/errors";
 
 const MajorCoursesPage = () => {
   const { universityId, facultyId, majorId } = useParams<{
@@ -42,8 +44,7 @@ const MajorCoursesPage = () => {
   const [addError, setAddError] = useState("");
   const [step, setStep] = useState(1); // 1: enter code, 2: form
   const [codeInput, setCodeInput] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [existingCourse, setExistingCourse] = useState(null as null | any);
+  const [existingCourse, setExistingCourse] = useState<CourseApiResponse | null>(null);
   const [form, setForm] = useState({
     courseName: "",
     courseCode: "",
@@ -114,9 +115,8 @@ const MajorCoursesPage = () => {
         requirementNature: "1",
       });
       setStep(2);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      if (err?.response?.status === 404) {
+    } catch (err: unknown) {
+      if (getApiErrorStatus(err) === 404) {
         setExistingCourse(null);
         setForm({
           courseName: "",
@@ -141,13 +141,24 @@ const MajorCoursesPage = () => {
     setAddLoading(true);
     setAddError("");
     try {
-      await apiClient.post("/courses", {
-        majorId: majorIdNum,
-        ...form,
-        credits: Number(form.credits),
+      const requirement = {
         requirementType: Number(form.requirementType),
         requirementNature: Number(form.requirementNature),
-      });
+      };
+      if (existingCourse) {
+        // The course already exists (e.g. in another major): link it instead of creating a duplicate.
+        await apiClient.post(`/courses/${existingCourse.id}/assign-to-major`, {
+          majorId: majorIdNum,
+          ...requirement,
+        });
+      } else {
+        await apiClient.post("/courses", {
+          majorId: majorIdNum,
+          ...form,
+          credits: Number(form.credits),
+          ...requirement,
+        });
+      }
       setAddDialogOpen(false);
       setForm({
         courseName: "",
@@ -165,14 +176,7 @@ const MajorCoursesPage = () => {
       // Refetch courses after adding
       refetchCourses();
     } catch (err: unknown) {
-      const errorMsg =
-        err && typeof err === "object" && "response" in err
-          ? (err as unknown as { response?: { data?: { message?: string } } })
-              .response?.data?.message
-          : "Failed to add course";
-      setAddError(
-        typeof errorMsg === "string" ? errorMsg : "Failed to add course"
-      );
+      setAddError(getApiErrorMessage(err, "Failed to add course"));
     } finally {
       setAddLoading(false);
     }

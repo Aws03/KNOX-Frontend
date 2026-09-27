@@ -53,7 +53,7 @@ export async function register(
 }
 
 export async function getUserInfo(): Promise<UserInfoResponse> {
-  const response = await apiClient.get<UserInfoResponse>("/Users/me");
+  const response = await apiClient.get<UserInfoResponse>("/users/me");
   return response.data;
 }
 

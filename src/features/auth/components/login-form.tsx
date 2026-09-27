@@ -11,6 +11,7 @@ import { Checkbox } from "@/shared/ui/checkbox";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { useAuth } from "@/app/providers/useAuth";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 type LoginFormProps = {
   email: string;
@@ -53,8 +54,7 @@ const LoginForm = ({
       });
     } catch (err) {
       console.error("Login error:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : t("auth.login.loginFailed");
+      const errorMessage = getApiErrorMessage(err, t("auth.login.loginFailed"));
       setError(errorMessage);
       toast.error(t("auth.login.loginFailed"), {
         description: errorMessage,

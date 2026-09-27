@@ -32,11 +32,10 @@ interface CoursesTableProps {
 
 const getRequirementTypeBadgeColor = (type: string) => {
   const colors: Record<string, string> = {
-    Specialist: "bg-purple-500/10 text-purple-700 border-purple-300",
-    "Core Course": "bg-blue-500/10 text-blue-700 border-blue-300",
-    "Free Course": "bg-green-500/10 text-green-700 border-green-300",
-    Elective: "bg-orange-500/10 text-orange-700 border-orange-300",
-    "Lab Course": "bg-pink-500/10 text-pink-700 border-pink-300",
+    University: "bg-purple-500/10 text-purple-700 border-purple-300",
+    Faculty: "bg-blue-500/10 text-blue-700 border-blue-300",
+    Major: "bg-green-500/10 text-green-700 border-green-300",
+    Remedial: "bg-orange-500/10 text-orange-700 border-orange-300",
   };
   return colors[type] || "bg-gray-500/10 text-gray-700 border-gray-300";
 };
@@ -44,7 +43,7 @@ const getRequirementTypeBadgeColor = (type: string) => {
 const getRequirementNatureBadgeColor = (nature: string) => {
   const colors: Record<string, string> = {
     Compulsory: "bg-red-500/10 text-red-700 border-red-300",
-    Optional: "bg-green-500/10 text-green-700 border-green-300",
+    Elective: "bg-green-500/10 text-green-700 border-green-300",
   };
   return colors[nature] || "bg-gray-500/10 text-gray-700 border-gray-300";
 };
