@@ -13,27 +13,30 @@ type RegistrationData = {
 
 export const useRegistration = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signInWithTokens } = useAuth();
 
   const handleRegistration = async (data: RegistrationData) => {
     try {
-      await register(data);
+      const result = await register(data);
 
-      try {
-        await login(data.email, data.password);
+      // With email verification off the API signs the new user in straight away.
+      if (result.tokens) {
+        await signInWithTokens(result.tokens.accessToken, result.tokens.refreshToken);
         toast.success("Welcome to Uni-Hub!", {
           description: "Your account has been created successfully.",
           duration: 3000,
         });
-        setTimeout(() => navigate("/"), 1500);
-      } catch (loginError) {
-        console.error("Auto-login failed:", loginError);
-        toast.info("Registration successful", {
-          description: "Please log in with your credentials.",
-          duration: 4000,
-        });
-        setTimeout(() => navigate("/auth/login"), 1500);
+        navigate("/");
+        return;
       }
+
+      toast.info("Check your email", {
+        description: result.otpSent
+          ? "We sent you a 6-digit code to verify your account."
+          : "Request a verification code to finish creating your account.",
+        duration: 5000,
+      });
+      navigate(`/auth/verify-account?email=${encodeURIComponent(data.email)}`);
     } catch (error: unknown) {
       console.error("Registration failed:", error);
       const errorMessage = getApiErrorMessage(error, "Registration failed. Please try again.");

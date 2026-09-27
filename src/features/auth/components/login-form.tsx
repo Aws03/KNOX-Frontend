@@ -11,7 +11,7 @@ import { Checkbox } from "@/shared/ui/checkbox";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { useAuth } from "@/app/providers/useAuth";
-import { getApiErrorMessage } from "@/lib/api/errors";
+import { getApiErrorMessage, getProblemDetails } from "@/lib/api/errors";
 
 type LoginFormProps = {
   email: string;
@@ -53,6 +53,11 @@ const LoginForm = ({
         },
       });
     } catch (err) {
+      // Accounts created while email verification is required must enter their code first.
+      if (getProblemDetails(err)?.code === "Auth.EmailNotVerified") {
+        navigate(`/auth/verify-account?email=${encodeURIComponent(email)}`);
+        return;
+      }
       console.error("Login error:", err);
       const errorMessage = getApiErrorMessage(err, t("auth.login.loginFailed"));
       setError(errorMessage);

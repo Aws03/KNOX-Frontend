@@ -8,7 +8,7 @@ type StoredUser = {
   name: string;
   email: string;
   roles: string[];
-  // Extended user details from /api/Users/me
+  // Extended user details from /api/users/me
   identityUserId?: number;
   domainUserId?: number;
   fullName?: string;

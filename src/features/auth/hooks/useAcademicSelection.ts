@@ -1,6 +1,10 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
-import { getPaginated } from "@/lib/api/pagination";
+import {
+  fetchFacultiesByUniversity,
+  fetchMajorsByFaculty,
+  fetchUniversities as fetchUniversityPage,
+} from "@/features/universities/api";
 import {
   type University,
   type Faculty,
@@ -17,11 +21,7 @@ export const useAcademicSelection = () => {
 
   const fetchUniversities = useCallback(async (pageNumber: number) => {
     try {
-      const res = await getPaginated<University>(
-        "/universities",
-        pageNumber,
-        PAGE_SIZE
-      );
+      const res = await fetchUniversityPage({ pageNumber, pageSize: PAGE_SIZE });
       return { items: res.items, hasNextPage: res.hasNextPage };
     } catch (error) {
       console.error("Failed to load universities", error);
@@ -33,11 +33,7 @@ export const useAcademicSelection = () => {
   const fetchFaculties = useCallback(
     async (universityId: number, pageNumber: number) => {
       try {
-        const res = await getPaginated<Faculty>(
-          `/faculties/by-university/${universityId}`,
-          pageNumber,
-          PAGE_SIZE
-        );
+        const res = await fetchFacultiesByUniversity(universityId, { pageNumber, pageSize: PAGE_SIZE });
         return { items: res.items, hasNextPage: res.hasNextPage };
       } catch (error) {
         console.error("Failed to load faculties", error);
@@ -51,11 +47,7 @@ export const useAcademicSelection = () => {
   const fetchMajors = useCallback(
     async (facultyId: number, pageNumber: number) => {
       try {
-        const res = await getPaginated<Major>(
-          `/majors/by-faculty/${facultyId}`,
-          pageNumber,
-          PAGE_SIZE
-        );
+        const res = await fetchMajorsByFaculty(facultyId, { pageNumber, pageSize: PAGE_SIZE });
         return { items: res.items, hasNextPage: res.hasNextPage };
       } catch (error) {
         console.error("Failed to load majors", error);

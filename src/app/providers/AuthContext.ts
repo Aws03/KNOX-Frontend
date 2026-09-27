@@ -5,7 +5,7 @@ interface User {
   name: string;
   email: string;
   roles: string[];
-  // Extended user details from /api/Users/me
+  // Extended user details from /api/users/me
   identityUserId?: number;
   domainUserId?: number;
   fullName?: string;
@@ -28,6 +28,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  /** Starts a session from tokens the API already issued (registration, account verification). */
+  signInWithTokens: (accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 

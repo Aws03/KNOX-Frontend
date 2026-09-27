@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getUserInfo } from "@/features/auth/api";
-import { persistSession, readSession } from "@/hooks/authStorage";
+import { persistSession, readSession } from "@/lib/auth/authStorage";
 import type { User } from "@/app/providers/AuthContext";
 
 export const useUserRefresh = (currentUser: User | null) => {

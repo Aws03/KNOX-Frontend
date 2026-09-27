@@ -3,7 +3,6 @@ import { jwtDecode } from "jwt-decode";
 import {
   login as apiLogin,
   logout as apiLogout,
-  refreshToken as apiRefreshToken,
   getUserInfo,
 } from "@/features/auth/api";
 import { AuthContext, type User, type AuthContextType } from "./AuthContext";
@@ -12,7 +11,9 @@ import {
   persistSession,
   readSession,
   getStoredRefreshToken,
-} from "@/hooks/authStorage";
+} from "@/lib/auth/authStorage";
+import { refreshSession } from "@/lib/api/apiClient";
+import { FILTER_STORAGE_KEY } from "@/features/courses/hooks/useFilterState";
 
 interface JWTPayload {
   sub: string;
@@ -39,7 +40,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
   const isInitialized = useRef(false);
   const refreshTimeoutRef = useRef<number | null>(null);
-  const isRefreshing = useRef(false);
   // Latches once a session is torn down (e.g. after a failed refresh) so
   // nothing already in flight or scheduled can restart the refresh cycle.
   // Cleared again on a fresh, successful login.
@@ -70,85 +70,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [clearRefreshTimer]);
 
-  // Refresh the access token before it expires
-  const scheduleTokenRefresh = useCallback(
-    async (expiresAt: number, currentRefreshToken: string) => {
-      // Once a session has been torn down, nothing may schedule or attempt
-      // another refresh - this is what stops the loop from restarting itself.
-      if (isSessionTerminated.current) {
-        return;
-      }
+  // decodeAndSetUser and the refresh timer call each other; the ref breaks the cycle.
+  const decodeAndSetUserRef = useRef<
+    (accessToken: string, refreshToken: string) => Promise<void>
+  >(async () => {});
 
-      clearRefreshTimer();
-
-      const now = Date.now();
-      const timeUntilExpiry = expiresAt - now;
-
-      // Refresh 5 minutes before expiry (or halfway through if token is short-lived)
-      const refreshBuffer = Math.min(5 * 60 * 1000, timeUntilExpiry / 2);
-      const timeUntilRefresh = timeUntilExpiry - refreshBuffer;
-
-      if (timeUntilRefresh <= 0) {
-        // Token is already expired or about to expire, refresh immediately
-        if (isRefreshing.current) {
-          return;
-        }
-
-        isRefreshing.current = true;
-        try {
-          const response = await apiRefreshToken({
-            refreshToken: currentRefreshToken,
-          });
-
-          if (response.accessToken) {
-            await decodeAndSetUser(
-              response.accessToken,
-              response.refreshToken
-            );
-          }
-        } catch (error) {
-          console.error("[Auth] Failed to refresh token:", error);
-          handleSessionExpired();
-        } finally {
-          isRefreshing.current = false;
-        }
-        return;
-      }
-
-      // Schedule refresh
-      const MAX_TIMEOUT = 2147483647; // ~24.8 days
-      const safeTimeout = Math.min(timeUntilRefresh, MAX_TIMEOUT);
-
-      if (typeof window !== "undefined") {
-        refreshTimeoutRef.current = window.setTimeout(async () => {
-          if (isSessionTerminated.current || isRefreshing.current) {
-            return;
-          }
-
-          isRefreshing.current = true;
-
-          try {
-            const response = await apiRefreshToken({
-              refreshToken: currentRefreshToken,
-            });
-
-            if (response.accessToken) {
-              await decodeAndSetUser(
-                response.accessToken,
-                response.refreshToken
-              );
-            }
-          } catch (error) {
-            console.error("[Auth] Failed to refresh token:", error);
-            handleSessionExpired();
-          } finally {
-            isRefreshing.current = false;
-          }
-        }, safeTimeout);
+  // Refreshes through the shared refreshSession() (single-flight, coordinated across tabs).
+  const refreshNow = useCallback(
+    async (knownAccessToken: string) => {
+      if (isSessionTerminated.current) return;
+      try {
+        const tokens = await refreshSession(knownAccessToken);
+        await decodeAndSetUserRef.current(tokens.accessToken, tokens.refreshToken);
+      } catch (error) {
+        console.error("[Auth] Failed to refresh token:", error);
+        handleSessionExpired();
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [clearRefreshTimer, handleSessionExpired]
+    [handleSessionExpired]
+  );
+
+  // Refresh the access token shortly before it expires.
+  const scheduleTokenRefresh = useCallback(
+    (expiresAt: number, accessToken: string) => {
+      // Once a session has been torn down, nothing may schedule another refresh.
+      if (isSessionTerminated.current || typeof window === "undefined") return;
+      clearRefreshTimer();
+
+      const timeUntilExpiry = expiresAt - Date.now();
+      // 5 minutes before expiry (or halfway through a short-lived token).
+      const refreshBuffer = Math.min(5 * 60 * 1000, timeUntilExpiry / 2);
+      const delay = Math.max(0, timeUntilExpiry - refreshBuffer);
+      const MAX_TIMEOUT = 2147483647; // ~24.8 days, setTimeout's limit
+
+      refreshTimeoutRef.current = window.setTimeout(
+        () => refreshNow(accessToken),
+        Math.min(delay, MAX_TIMEOUT)
+      );
+    },
+    [clearRefreshTimer, refreshNow]
   );
 
   // Decode JWT and extract user info and store in localStorage
@@ -196,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           expiresAt,
         });
 
-        // Fetch detailed user info from /api/Users/me
+        // Fetch detailed user info from /api/users/me
         try {
           const userInfo = await getUserInfo();
 
@@ -244,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(userData);
 
         // Schedule token refresh
-        await scheduleTokenRefresh(expiresAt, refreshToken);
+        scheduleTokenRefresh(expiresAt, accessToken);
       } catch (error) {
         console.error("[Auth] Failed to decode token:", error);
         throw error;
@@ -252,6 +212,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     [handleSessionExpired, scheduleTokenRefresh]
   );
+  decodeAndSetUserRef.current = decodeAndSetUser;
 
   // Login function
   const login = useCallback(
@@ -280,6 +241,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [decodeAndSetUser, handleSessionExpired]
   );
 
+  const signInWithTokens = useCallback(
+    async (accessToken: string, refreshToken: string) => {
+      isSessionTerminated.current = false;
+      await decodeAndSetUser(accessToken, refreshToken);
+    },
+    [decodeAndSetUser]
+  );
+
   // Logout function
   const logout = useCallback(async () => {
     try {
@@ -289,7 +258,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("[Auth] Logout error:", error);
     } finally {
       // Clear filter storage on logout
-      localStorage.removeItem("course_filter_state");
+      localStorage.removeItem(FILTER_STORAGE_KEY);
       handleSessionExpired();
     }
   }, [handleSessionExpired]);
@@ -306,31 +275,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const isExpired = existingSession.expiresAt <= Date.now();
 
           if (isExpired) {
-            // Try to refresh with refresh token
-            try {
-              const response = await apiRefreshToken({
-                refreshToken: existingSession.refreshToken,
-              });
-
-              if (response.accessToken && response.refreshToken) {
-                await decodeAndSetUser(
-                  response.accessToken,
-                  response.refreshToken
-                );
-              } else {
-                handleSessionExpired();
-              }
-            } catch (error) {
-              console.error("[Auth] Failed to refresh expired token:", error);
-              handleSessionExpired();
-            }
+            await refreshNow(existingSession.token);
           } else {
             // Session still valid
             setUser(existingSession.user);
-            await scheduleTokenRefresh(
-              existingSession.expiresAt,
-              existingSession.refreshToken
-            );
+            scheduleTokenRefresh(existingSession.expiresAt, existingSession.token);
           }
         }
       } catch (error) {
@@ -346,18 +295,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       clearRefreshTimer();
     };
-  }, [
-    clearRefreshTimer,
-    decodeAndSetUser,
-    handleSessionExpired,
-    scheduleTokenRefresh,
-  ]);
+  }, [clearRefreshTimer, handleSessionExpired, refreshNow, scheduleTokenRefresh]);
 
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     isLoading,
     login,
+    signInWithTokens,
     logout,
   };
 

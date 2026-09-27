@@ -16,31 +16,20 @@ export interface RegisterRequest {
   majorId: number;
 }
 
+/** POST /auth/register: tokens when the account can sign in now, otherwise a verification code was emailed. */
 export interface RegisterResponse {
-  message?: string;
-  userId?: string;
+  requiresVerification: boolean;
+  otpSent: boolean;
+  tokens?: LoginResponse;
 }
 
-export interface RefreshRequest {
-  refreshToken: string;
-}
-
-export interface RefreshResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: string;
-}
-
-export interface LogoutRequest {
-  refreshToken: string;
+export interface VerifyAccountRequest {
+  email: string;
+  otp: string;
 }
 
 export interface ForgotPasswordRequest {
   email: string;
-}
-
-export interface ForgotPasswordResponse {
-  message: string;
 }
 
 export interface ResetPasswordRequest {
@@ -49,17 +38,9 @@ export interface ResetPasswordRequest {
   newPassword: string;
 }
 
-export interface ResetPasswordResponse {
-  message: string;
-}
-
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
-}
-
-export interface ChangePasswordResponse {
-  message: string;
 }
 
 export interface UserInfoResponse {
@@ -71,8 +52,8 @@ export interface UserInfoResponse {
   role: string;
   isActive: boolean;
   isVerified: boolean;
-  verificationDate: string;
-  profilePictureUrl: string | null;
+  verificationDate?: string;
+  profilePictureUrl?: string;
   universityId: number;
   universityName: string;
   facultyId: number;

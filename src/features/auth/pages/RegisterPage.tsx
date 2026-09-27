@@ -9,7 +9,7 @@ import {
 
 import Logo from "@/assets/logo";
 import AuthBackgroundShape from "@/assets/svg/auth-background-shape";
-import RegisterForm from "@/features/auth/components/register-from";
+import RegisterForm from "@/features/auth/components/register-form";
 
 const RegisterPage = () => {
   const { t } = useTranslation();
