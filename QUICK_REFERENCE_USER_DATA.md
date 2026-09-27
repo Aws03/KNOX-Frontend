@@ -19,7 +19,7 @@ user?.email; // string - User's email address
 user?.roles; // string[] - User roles from JWT
 ```
 
-### Extended Information (from /api/Users/me)
+### Extended Information (from /api/users/me)
 
 ```typescript
 user?.identityUserId; // number - Identity user ID
@@ -28,8 +28,8 @@ user?.fullName; // string - User's full name (preferred over name)
 user?.role; // string - User role (e.g., "Writer", "Admin")
 user?.dateJoined; // string - ISO date when user joined
 user?.isActive; // boolean - Is the user account active?
-user?.isVerfied; // boolean - Is the user verified?
-user?.verficationDate; // string - ISO date of verification
+user?.isVerified; // boolean - Is the user verified?
+user?.verificationDate; // string - ISO date of verification
 
 // Academic Information
 user?.universityId; // number - University ID
@@ -91,7 +91,7 @@ function Dashboard() {
 function QuizSection() {
   const { user } = useAuth();
 
-  if (!user?.isVerfied) {
+  if (!user?.isVerified) {
     return <VerificationRequired />;
   }
 
@@ -131,7 +131,7 @@ function ProfileCard() {
       <CardContent>
         <div>
           <Badge>{user?.role}</Badge>
-          {user?.isVerfied && <Badge variant="success">Verified</Badge>}
+          {user?.isVerified && <Badge variant="success">Verified</Badge>}
         </div>
         <Separator />
         <div className="space-y-2">
@@ -198,12 +198,12 @@ All user fields are optional (`?`), so always use optional chaining:
 // ✅ Good
 user?.fullName;
 user?.universityId;
-user?.isVerfied;
+user?.isVerified;
 
 // ❌ Bad (will cause errors if user is null)
 user.fullName;
 user.universityId;
-user.isVerfied;
+user.isVerified;
 ```
 
 ## Default Values
@@ -224,7 +224,7 @@ if (user?.universityId && user?.universityName) {
 }
 
 // Check verification status
-if (user?.isVerfied) {
+if (user?.isVerified) {
   // Show verified-only features
 }
 

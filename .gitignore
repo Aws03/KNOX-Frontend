@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local environment overrides (VITE_* values are bundled into the public build anyway)
+.env
+.env.*
+!.env.example
