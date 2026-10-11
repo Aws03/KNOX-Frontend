@@ -2,7 +2,7 @@
 
 # ---- Build ----
 # The bundle is plain JS/CSS, so it is built once on the native platform for every target architecture.
-FROM --platform=$BUILDPLATFORM node:22-alpine AS build
+FROM --platform=$BUILDPLATFORM node:25-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
